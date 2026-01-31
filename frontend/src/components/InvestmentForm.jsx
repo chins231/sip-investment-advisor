@@ -119,15 +119,23 @@ const InvestmentForm = ({ onSubmit, loading }) => {
   };
 
   const handleSectorToggle = (sectorKey) => {
+    console.log('[TOGGLE] Clicked sector:', sectorKey);
+    
     setFormData((prev) => {
       const currentSectors = Array.isArray(prev.sector_preferences) ? prev.sector_preferences : [];
       const isSelected = currentSectors.includes(sectorKey);
       
+      console.log('[TOGGLE] Before:', currentSectors, 'Adding:', sectorKey, 'IsSelected:', isSelected);
+      
+      const newSectors = isSelected
+        ? currentSectors.filter(s => s !== sectorKey)
+        : [...currentSectors, sectorKey];
+      
+      console.log('[TOGGLE] After:', newSectors);
+      
       return {
         ...prev,
-        sector_preferences: isSelected
-          ? currentSectors.filter(s => s !== sectorKey)
-          : [...currentSectors, sectorKey]
+        sector_preferences: newSectors
       };
     });
   };
