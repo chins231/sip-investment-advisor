@@ -248,7 +248,7 @@ const InvestmentForm = ({ onSubmit, loading }) => {
 
       <div className="form-group">
         <label>
-          Sector Preferences (Optional)
+          Sector Preferences (Optional) <span style={{fontSize: '0.7rem', color: '#10b981'}}>v2.1</span>
           <button
             type="button"
             className="btn-link"
@@ -265,24 +265,20 @@ const InvestmentForm = ({ onSubmit, loading }) => {
         {showSectorSelection && (
           <div className="sector-selection">
             {availableSectors.map((sector) => {
-              const isSelected = Array.isArray(formData.sector_preferences) &&
-                                formData.sector_preferences.includes(sector.key);
-              
-              // Debug logging
-              if (sector.key === 'metal') {
-                console.log('Metal sector check:', {
-                  sectorKey: sector.key,
-                  sectorPreferences: formData.sector_preferences,
-                  isArray: Array.isArray(formData.sector_preferences),
-                  isSelected: isSelected
-                });
-              }
+              // Explicitly check if sector is selected
+              const sectorPrefs = formData.sector_preferences || [];
+              const isSelected = Array.isArray(sectorPrefs) && sectorPrefs.length > 0 && sectorPrefs.includes(sector.key);
               
               return (
                 <div
                   key={sector.key}
-                  className={`sector-option ${isSelected ? 'selected' : ''}`}
-                  onClick={() => !loading && handleSectorToggle(sector.key)}
+                  className={`sector-option${isSelected ? ' selected' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!loading) {
+                      handleSectorToggle(sector.key);
+                    }
+                  }}
                 >
                   <div className="sector-checkbox">
                     {isSelected ? '✓' : ''}
