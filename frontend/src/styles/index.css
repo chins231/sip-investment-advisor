@@ -37,6 +37,44 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+/* Fund Count Information Banner */
+.fund-count-info-banner {
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left: 4px solid var(--primary-color);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+
+.fund-count-info-banner .info-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.fund-count-info-banner .info-content {
+  flex: 1;
+  color: #1e40af;
+}
+
+.fund-count-info-banner .info-message {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.fund-count-info-banner .info-suggestion {
+  font-size: 0.9rem;
+  color: #1e3a8a;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
 }
 
 .header {

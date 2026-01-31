@@ -4,7 +4,7 @@ import FundPerformance from './FundPerformance';
 import FundHoldings from './FundHoldings';
 
 const RecommendationResults = ({ data }) => {
-  const { recommendations, portfolio_summary, investment_strategy, data_source } = data;
+  const { recommendations, portfolio_summary, investment_strategy, data_source, fund_count_info } = data;
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedHoldings, setSelectedHoldings] = useState(null);
 
@@ -56,6 +56,23 @@ const RecommendationResults = ({ data }) => {
               </span>
             </>
           )}
+        </div>
+      )}
+      
+      {/* Fund Count Information Banner */}
+      {fund_count_info && (
+        <div className="fund-count-info-banner">
+          <div className="info-icon">ℹ️</div>
+          <div className="info-content">
+            <div className="info-message">
+              <strong>{fund_count_info.message}</strong>
+            </div>
+            {fund_count_info.suggestion && (
+              <div className="info-suggestion">
+                💡 <em>{fund_count_info.suggestion}</em>
+              </div>
+            )}
+          </div>
         </div>
       )}
       

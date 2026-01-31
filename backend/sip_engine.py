@@ -277,6 +277,17 @@ class SIPRecommendationEngine:
         if data_source_info:
             result['data_source'] = data_source_info
         
+        # Add fund count explanation if fewer funds than requested
+        if max_funds is not None and len(recommendations) < max_funds:
+            min_sip_for_max_funds = max_funds * 500  # Minimum ₹500 per fund
+            result['fund_count_info'] = {
+                'requested': max_funds,
+                'showing': len(recommendations),
+                'reason': 'optimal_diversification',
+                'message': f'Showing {len(recommendations)} out of {max_funds} requested funds based on optimal portfolio diversification for your risk profile.',
+                'suggestion': f'To invest in more funds, consider increasing your SIP amount to at least ₹{min_sip_for_max_funds:,}/month (₹500 minimum per fund).' if monthly_investment < min_sip_for_max_funds else None
+            }
+        
         return result
     
     def get_investment_strategy(self, risk_profile, investment_years, sector_preferences=None):
