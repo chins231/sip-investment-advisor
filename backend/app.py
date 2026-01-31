@@ -134,8 +134,3 @@ def get_recommendations(user_id):
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
-
-
-# Import and register blueprints
-from routes import api
-app.register_blueprint(api, url_prefix='/api')
