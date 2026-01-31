@@ -1,8 +1,7 @@
-# Version: 2.0.1 - Force Gunicorn worker reload
-# CRITICAL FIX: Gunicorn workers cache app.py, this forces reload
+# Version: 2.0.2 - Fix SQLAlchemy instance conflict
+# CRITICAL FIX: Import db from models.py to avoid multiple instances
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import datetime
 import json
@@ -15,48 +14,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sip_advisor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
-db = SQLAlchemy(app)
-
-# Database Models
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    risk_profile = db.Column(db.String(20), nullable=False)  # low, medium, high
-    investment_years = db.Column(db.Integer, nullable=False)
-    monthly_investment = db.Column(db.Float, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'email': self.email,
-            'risk_profile': self.risk_profile,
-            'investment_years': self.investment_years,
-            'monthly_investment': self.monthly_investment,
-            'created_at': self.created_at.isoformat()
-        }
-
-class SIPRecommendation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    fund_name = db.Column(db.String(200), nullable=False)
-    fund_type = db.Column(db.String(50), nullable=False)
-    allocation_percentage = db.Column(db.Float, nullable=False)
-    expected_return = db.Column(db.Float, nullable=False)
-    risk_level = db.Column(db.String(20), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'fund_name': self.fund_name,
-            'fund_type': self.fund_type,
-            'allocation_percentage': self.allocation_percentage,
-            'expected_return': self.expected_return,
-            'risk_level': self.risk_level
-        }
+# Import db from models and initialize with app
+# Import db and models from models.py
+from models import db, User, SIPRecommendation
+db.init_app(app)
 
 # Create tables
 with app.app_context():
