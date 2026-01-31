@@ -63,7 +63,12 @@ with app.app_context():
 # Routes
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    return jsonify({'status': 'healthy', 'message': 'SIP Advisor API is running'})
+    return jsonify({
+        'status': 'healthy',
+        'message': 'SIP Advisor API is running',
+        'version': '2.0.0',
+        'features': ['fund_count_info', 'sector_selection', 'api_integration']
+    })
 
 @app.route('/api/user/profile', methods=['POST'])
 def create_user_profile():

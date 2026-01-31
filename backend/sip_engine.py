@@ -1,3 +1,4 @@
+# Version: 2.0.0 - Fund count info feature added
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
