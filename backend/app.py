@@ -1,3 +1,5 @@
+# Version: 2.0.1 - Force Gunicorn worker reload
+# CRITICAL FIX: Gunicorn workers cache app.py, this forces reload
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
