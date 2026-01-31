@@ -278,6 +278,7 @@ class SIPRecommendationEngine:
             result['data_source'] = data_source_info
         
         # Add fund count explanation if fewer funds than requested
+        # This helps users understand why they're seeing fewer funds and how to get more
         if max_funds is not None and len(recommendations) < max_funds:
             min_sip_for_max_funds = max_funds * 500  # Minimum ₹500 per fund
             result['fund_count_info'] = {
