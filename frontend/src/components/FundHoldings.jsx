@@ -35,8 +35,13 @@ const FundHoldings = ({ fundName }) => {
 
   if (error) {
     return (
-      <div style={{ padding: '1rem', background: '#fee2e2', borderRadius: '8px', marginTop: '1rem' }}>
-        <p style={{ color: '#dc2626' }}>{error}</p>
+      <div style={{ padding: '1.5rem', background: '#fef3c7', borderRadius: '8px', marginTop: '1rem', border: '1px solid #fbbf24' }}>
+        <p style={{ color: '#92400e', marginBottom: '0.5rem', fontWeight: '600' }}>
+          ℹ️ Holdings data not available for this fund
+        </p>
+        <p style={{ color: '#78350f', fontSize: '0.9rem' }}>
+          This fund is part of a diversified portfolio. Holdings information is only available for sector-specific funds.
+        </p>
       </div>
     );
   }
