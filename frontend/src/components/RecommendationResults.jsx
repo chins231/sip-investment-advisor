@@ -187,30 +187,28 @@ const RecommendationResults = ({ data }) => {
                   {selectedFund === rec.fund_name ? '✕ Hide Performance' : '📊 View Performance'}
                 </button>
                 
-                {rec.has_holdings && (
-                  <button
-                    onClick={() => setSelectedHoldings(selectedHoldings === rec.fund_name ? null : rec.fund_name)}
-                    style={{
-                      padding: '0.75rem 1.5rem',
-                      background: selectedHoldings === rec.fund_name ? '#ef4444' : '#10b981',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: '600',
-                      transition: 'all 0.3s'
-                    }}
-                  >
-                    {selectedHoldings === rec.fund_name ? '✕ Hide Holdings' : '🏢 View Holdings'}
-                  </button>
-                )}
+                <button
+                  onClick={() => setSelectedHoldings(selectedHoldings === rec.fund_name ? null : rec.fund_name)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: selectedHoldings === rec.fund_name ? '#ef4444' : '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    transition: 'all 0.3s'
+                  }}
+                >
+                  {selectedHoldings === rec.fund_name ? '✕ Hide Holdings' : '🏢 View Holdings'}
+                </button>
               </div>
               
               {selectedFund === rec.fund_name && (
                 <FundPerformance fundName={rec.fund_name} />
               )}
               
-              {selectedHoldings === rec.fund_name && rec.has_holdings && (
+              {selectedHoldings === rec.fund_name && (
                 <FundHoldings fundName={rec.fund_name} />
               )}
             </div>
