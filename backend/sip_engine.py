@@ -94,6 +94,17 @@ class SIPRecommendationEngine:
             }
         }
     
+    def round_sip_amount(self, amount):
+        """
+        Round SIP amount to nearest 50 or 100 for cleaner values
+        """
+        if amount < 100:
+            return round(amount / 10) * 10  # Round to nearest 10
+        elif amount < 1000:
+            return round(amount / 50) * 50  # Round to nearest 50
+        else:
+            return round(amount / 100) * 100  # Round to nearest 100
+    
     def adjust_allocation_by_duration(self, risk_profile, investment_years):
         """
         Adjust asset allocation based on investment duration
@@ -195,11 +206,12 @@ class SIPRecommendationEngine:
         recommendations = []
         for category, details in returns['category_wise'].items():
             for fund in details['funds']:
+                raw_monthly_investment = details['monthly_investment'] / len(details['funds'])
                 recommendations.append({
                     'fund_name': fund,
                     'fund_type': category.replace('_', ' ').title(),
                     'allocation_percentage': details['allocation_percentage'] / len(details['funds']),
-                    'monthly_investment': details['monthly_investment'] / len(details['funds']),
+                    'monthly_investment': self.round_sip_amount(raw_monthly_investment),
                     'expected_return': details['expected_return_percentage'],
                     'risk_level': risk_profile.replace('_', ' ').title()
                 })
@@ -213,7 +225,8 @@ class SIPRecommendationEngine:
             total_allocation = sum(r['allocation_percentage'] for r in recommendations)
             for rec in recommendations:
                 rec['allocation_percentage'] = (rec['allocation_percentage'] / total_allocation) * 100
-                rec['monthly_investment'] = monthly_investment * (rec['allocation_percentage'] / 100)
+                raw_monthly_investment = monthly_investment * (rec['allocation_percentage'] / 100)
+                rec['monthly_investment'] = self.round_sip_amount(raw_monthly_investment)
         
         return {
             'recommendations': recommendations,
