@@ -275,24 +275,16 @@ const InvestmentForm = ({ onSubmit, loading }) => {
             {availableSectors.map((sector) => {
               // Explicitly check if sector is selected
               const sectorPrefs = formData.sector_preferences || [];
-              const isSelected = Array.isArray(sectorPrefs) && sectorPrefs.length > 0 && sectorPrefs.includes(sector.key);
-              
-              // Force log to console
-              console.log(`[v2.1] Sector ${sector.key}:`, {
-                sectorPrefs,
-                length: sectorPrefs.length,
-                includes: sectorPrefs.includes(sector.key),
-                isSelected
-              });
+              const isSelected = Array.isArray(sectorPrefs) && sectorPrefs.length > 0 && sectorPrefs.includes(sector.value);
               
               return (
                 <div
-                  key={sector.key}
+                  key={sector.value}
                   className={`sector-option${isSelected ? ' selected' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
                     if (!loading) {
-                      handleSectorToggle(sector.key);
+                      handleSectorToggle(sector.value);
                     }
                   }}
                 >
@@ -300,7 +292,7 @@ const InvestmentForm = ({ onSubmit, loading }) => {
                     {isSelected ? '✓' : ''}
                   </div>
                   <div className="sector-info">
-                    <strong>{sector.name}</strong>
+                    <strong>{sector.label}</strong>
                     <small>{sector.description}</small>
                   </div>
                 </div>
@@ -312,9 +304,9 @@ const InvestmentForm = ({ onSubmit, loading }) => {
         {Array.isArray(formData.sector_preferences) && formData.sector_preferences.length > 0 && (
           <div className="selected-sectors-summary">
             <strong>Selected: </strong>
-            {formData.sector_preferences.map(key => {
-              const sector = availableSectors.find(s => s.key === key);
-              return sector ? sector.name : key;
+            {formData.sector_preferences.map(value => {
+              const sector = availableSectors.find(s => s.value === value);
+              return sector ? sector.label : value;
             }).join(', ')}
           </div>
         )}
