@@ -61,10 +61,10 @@ class SIPRecommendation(db.Model):
 # Create tables
 with app.app_context():
     db.create_all()
+
 # Import and register blueprints
 from routes import api
 app.register_blueprint(api, url_prefix='/api')
-
 
 # Routes
 @app.route('/api/health', methods=['GET'])
