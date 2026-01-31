@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import FundPerformance from './FundPerformance';
+import FundHoldings from './FundHoldings';
 
 const RecommendationResults = ({ data }) => {
   const { recommendations, portfolio_summary, investment_strategy } = data;
   const [selectedFund, setSelectedFund] = useState(null);
+  const [selectedHoldings, setSelectedHoldings] = useState(null);
 
   const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -125,24 +127,48 @@ const RecommendationResults = ({ data }) => {
                   <value>{formatCurrency(rec.monthly_investment)}</value>
                 </div>
               </div>
-              <button
-                onClick={() => setSelectedFund(selectedFund === rec.fund_name ? null : rec.fund_name)}
-                style={{
-                  marginTop: '1rem',
-                  padding: '0.75rem 1.5rem',
-                  background: selectedFund === rec.fund_name ? '#ef4444' : '#2563eb',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  transition: 'all 0.3s'
-                }}
-              >
-                {selectedFund === rec.fund_name ? '✕ Hide Details' : '📊 View Performance & Reviews'}
-              </button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '1rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setSelectedFund(selectedFund === rec.fund_name ? null : rec.fund_name)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: selectedFund === rec.fund_name ? '#ef4444' : '#2563eb',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    transition: 'all 0.3s'
+                  }}
+                >
+                  {selectedFund === rec.fund_name ? '✕ Hide Performance' : '📊 View Performance'}
+                </button>
+                
+                {rec.has_holdings && (
+                  <button
+                    onClick={() => setSelectedHoldings(selectedHoldings === rec.fund_name ? null : rec.fund_name)}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: selectedHoldings === rec.fund_name ? '#ef4444' : '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      transition: 'all 0.3s'
+                    }}
+                  >
+                    {selectedHoldings === rec.fund_name ? '✕ Hide Holdings' : '🏢 View Holdings'}
+                  </button>
+                )}
+              </div>
+              
               {selectedFund === rec.fund_name && (
                 <FundPerformance fundName={rec.fund_name} />
+              )}
+              
+              {selectedHoldings === rec.fund_name && rec.has_holdings && (
+                <FundHoldings fundName={rec.fund_name} />
               )}
             </div>
           ))}
@@ -158,7 +184,21 @@ const RecommendationResults = ({ data }) => {
               {investment_strategy.strategy}
             </p>
 
-            <h3>Key Benefits of SIP</h3>
+            {investment_strategy.sector_warning && (
+              <div style={{ marginTop: '1rem', padding: '1rem', background: '#fee2e2', borderRadius: '8px', border: '1px solid #ef4444' }}>
+                <strong style={{ color: '#dc2626' }}>⚠️ Sector Risk Warning:</strong>
+                <p style={{ marginTop: '0.5rem', color: '#7f1d1d' }}>{investment_strategy.sector_warning}</p>
+              </div>
+            )}
+
+            {investment_strategy.sector_note && (
+              <div style={{ marginTop: '1rem', padding: '1rem', background: '#dbeafe', borderRadius: '8px', border: '1px solid #2563eb' }}>
+                <strong style={{ color: '#1e40af' }}>ℹ️ Sector Investment Note:</strong>
+                <p style={{ marginTop: '0.5rem', color: '#1e3a8a' }}>{investment_strategy.sector_note}</p>
+              </div>
+            )}
+
+            <h3 style={{ marginTop: '1.5rem' }}>Key Benefits of SIP</h3>
             <ul>
               {investment_strategy.sip_benefits.map((benefit, index) => (
                 <li key={index}>{benefit}</li>

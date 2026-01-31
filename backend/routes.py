@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from sip_engine import SIPRecommendationEngine
 from models import db, User, SIPRecommendation
 from fund_data import FundDataService
+from sector_funds import get_sectors_list, get_sector_funds, SECTOR_FUNDS
 
 api = Blueprint('api', __name__)
 engine = SIPRecommendationEngine()
@@ -33,12 +34,22 @@ def generate_recommendations():
         if max_funds is not None:
             max_funds = int(max_funds)
         
+        # Get sector preferences if provided
+        sector_preferences = data.get('sector_preferences', None)
+        if sector_preferences and len(sector_preferences) > 0:
+            # Validate sectors
+            valid_sectors = list(SECTOR_FUNDS.keys())
+            for sector in sector_preferences:
+                if sector not in valid_sectors:
+                    return jsonify({'error': f'Invalid sector: {sector}'}), 400
+        
         # Generate recommendations
         recommendations = engine.generate_recommendations(
             risk_profile=risk_profile_key,
             investment_years=int(data['investment_years']),
             monthly_investment=float(data['monthly_investment']),
-            max_funds=max_funds
+            max_funds=max_funds,
+            sector_preferences=sector_preferences
         )
         
         # Check if user exists, create or update
@@ -186,5 +197,59 @@ def get_fund_reviews(fund_name):
     try:
         reviews = fund_service.get_fund_reviews(fund_name)
         return jsonify(reviews), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/sectors', methods=['GET'])
+def get_sectors():
+    """
+    Get list of available investment sectors
+    """
+    try:
+        sectors = get_sectors_list()
+        return jsonify({'sectors': sectors}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/fund-holdings/<fund_name>', methods=['GET'])
+def get_fund_holdings(fund_name):
+    """
+    Get portfolio holdings for a specific fund
+    """
+    try:
+        # Search for fund in all sectors
+        for sector_key, sector_data in SECTOR_FUNDS.items():
+            for fund in sector_data['funds']:
+                if fund['name'].lower() == fund_name.lower():
+                    return jsonify({
+                        'fund_name': fund['name'],
+                        'fund_type': fund['type'],
+                        'sector': sector_data['name'],
+                        'top_holdings': fund['top_holdings'],
+                        'holdings_url': fund['holdings_url'],
+                        'description': fund['description'],
+                        'expected_return': fund['expected_return'],
+                        'risk_level': fund['risk_level']
+                    }), 200
+        
+        return jsonify({'error': 'Fund not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/sector-funds', methods=['POST'])
+def get_sector_specific_funds():
+    """
+    Get funds based on selected sectors
+    """
+    try:
+        data = request.json
+        sector_preferences = data.get('sectors', ['diversified'])
+        
+        funds = get_sector_funds(sector_preferences)
+        
+        return jsonify({
+            'funds': funds,
+            'selected_sectors': sector_preferences
+        }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

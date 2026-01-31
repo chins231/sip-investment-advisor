@@ -179,9 +179,10 @@ class SIPRecommendationEngine:
             }
         }
     
-    def generate_recommendations(self, risk_profile, investment_years, monthly_investment, max_funds=None):
+    def generate_recommendations(self, risk_profile, investment_years, monthly_investment, max_funds=None, sector_preferences=None):
         """
         Generate complete SIP recommendations
+        If sector_preferences is provided, include sector-specific funds
         """
         # Validate inputs
         if risk_profile not in ['low_risk', 'medium_risk', 'high_risk']:
@@ -204,17 +205,41 @@ class SIPRecommendationEngine:
         
         # Generate fund recommendations
         recommendations = []
-        for category, details in returns['category_wise'].items():
-            for fund in details['funds']:
-                raw_monthly_investment = details['monthly_investment'] / len(details['funds'])
-                recommendations.append({
-                    'fund_name': fund,
-                    'fund_type': category.replace('_', ' ').title(),
-                    'allocation_percentage': details['allocation_percentage'] / len(details['funds']),
-                    'monthly_investment': self.round_sip_amount(raw_monthly_investment),
-                    'expected_return': details['expected_return_percentage'],
-                    'risk_level': risk_profile.replace('_', ' ').title()
-                })
+        
+        # If sector preferences are specified, use sector-specific funds
+        if sector_preferences and len(sector_preferences) > 0:
+            from sector_funds import get_sector_funds
+            sector_funds = get_sector_funds(sector_preferences)
+            
+            # Distribute allocation across sector funds
+            if sector_funds:
+                allocation_per_fund = 100 / len(sector_funds)
+                for fund in sector_funds:
+                    raw_monthly_investment = monthly_investment * (allocation_per_fund / 100)
+                    recommendations.append({
+                        'fund_name': fund['name'],
+                        'fund_type': fund['type'],
+                        'allocation_percentage': allocation_per_fund,
+                        'monthly_investment': self.round_sip_amount(raw_monthly_investment),
+                        'expected_return': fund['expected_return'],
+                        'risk_level': fund['risk_level'],
+                        'sector': fund.get('sector', 'Sector-Specific'),
+                        'has_holdings': True  # Flag to show holdings button
+                    })
+        else:
+            # Use traditional diversified approach
+            for category, details in returns['category_wise'].items():
+                for fund in details['funds']:
+                    raw_monthly_investment = details['monthly_investment'] / len(details['funds'])
+                    recommendations.append({
+                        'fund_name': fund,
+                        'fund_type': category.replace('_', ' ').title(),
+                        'allocation_percentage': details['allocation_percentage'] / len(details['funds']),
+                        'monthly_investment': self.round_sip_amount(raw_monthly_investment),
+                        'expected_return': details['expected_return_percentage'],
+                        'risk_level': risk_profile.replace('_', ' ').title(),
+                        'has_holdings': False
+                    })
         
         # Limit number of funds if max_funds is specified
         if max_funds is not None and len(recommendations) > max_funds:
@@ -231,10 +256,10 @@ class SIPRecommendationEngine:
         return {
             'recommendations': recommendations,
             'portfolio_summary': returns['portfolio_summary'],
-            'investment_strategy': self.get_investment_strategy(risk_profile, investment_years)
+            'investment_strategy': self.get_investment_strategy(risk_profile, investment_years, sector_preferences)
         }
     
-    def get_investment_strategy(self, risk_profile, investment_years):
+    def get_investment_strategy(self, risk_profile, investment_years, sector_preferences=None):
         """
         Provide investment strategy advice
         """
@@ -258,7 +283,7 @@ class SIPRecommendationEngine:
         
         duration_key = 'short' if investment_years <= 3 else 'long' if investment_years >= 10 else 'medium'
         
-        return {
+        strategy_response = {
             'strategy': strategies[risk_profile][duration_key],
             'rebalancing': 'Review and rebalance portfolio annually',
             'sip_benefits': [
@@ -268,6 +293,21 @@ class SIPRecommendationEngine:
                 'Flexibility to increase SIP amount'
             ]
         }
+        
+        # Add sector-specific warnings if applicable
+        if sector_preferences and len(sector_preferences) > 0:
+            if len(sector_preferences) == 1:
+                strategy_response['sector_warning'] = (
+                    f"⚠️ You've selected only {sector_preferences[0]} sector. "
+                    "Sector-specific investments carry higher risk due to lack of diversification. "
+                    "Consider adding 2-3 more sectors for better risk management."
+                )
+            strategy_response['sector_note'] = (
+                "Sector funds can be volatile. Monitor sector performance regularly and "
+                "consider rebalancing if any sector becomes overweight in your portfolio."
+            )
+        
+        return strategy_response
 
 # Example usage
 if __name__ == '__main__':

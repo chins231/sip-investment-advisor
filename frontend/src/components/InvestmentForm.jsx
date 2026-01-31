@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 
 const InvestmentForm = ({ onSubmit, loading }) => {
   const [formData, setFormData] = useState({
@@ -8,9 +9,25 @@ const InvestmentForm = ({ onSubmit, loading }) => {
     investment_years: 5,
     monthly_investment: 5000,
     max_funds: 5,
+    sector_preferences: [],
   });
 
   const [errors, setErrors] = useState({});
+  const [availableSectors, setAvailableSectors] = useState([]);
+  const [showSectorSelection, setShowSectorSelection] = useState(false);
+
+  // Fetch available sectors on component mount
+  useEffect(() => {
+    const fetchSectors = async () => {
+      try {
+        const response = await api.get('/sectors');
+        setAvailableSectors(response.data.sectors);
+      } catch (error) {
+        console.error('Failed to fetch sectors:', error);
+      }
+    };
+    fetchSectors();
+  }, []);
 
   const riskProfiles = [
     {
@@ -99,6 +116,20 @@ const InvestmentForm = ({ onSubmit, loading }) => {
         risk_profile: '',
       }));
     }
+  };
+
+  const handleSectorToggle = (sectorKey) => {
+    setFormData((prev) => {
+      const currentSectors = prev.sector_preferences || [];
+      const isSelected = currentSectors.includes(sectorKey);
+      
+      return {
+        ...prev,
+        sector_preferences: isSelected
+          ? currentSectors.filter(s => s !== sectorKey)
+          : [...currentSectors, sectorKey]
+      };
+    });
   };
 
   return (
@@ -212,6 +243,61 @@ const InvestmentForm = ({ onSubmit, loading }) => {
         <small>Choose between 1 to 15 funds (Recommended: 3-7 for diversification)</small>
         {errors.max_funds && (
           <small className="error">{errors.max_funds}</small>
+        )}
+      </div>
+
+      <div className="form-group">
+        <label>
+          Sector Preferences (Optional)
+          <button
+            type="button"
+            className="btn-link"
+            onClick={() => setShowSectorSelection(!showSectorSelection)}
+            style={{ marginLeft: '10px', fontSize: '0.9rem' }}
+          >
+            {showSectorSelection ? '▼ Hide Sectors' : '▶ Show Sectors'}
+          </button>
+        </label>
+        <small style={{ display: 'block', marginBottom: '10px' }}>
+          Select specific sectors for targeted investments. Leave empty for diversified portfolio.
+        </small>
+        
+        {showSectorSelection && (
+          <div className="sector-selection">
+            {availableSectors.map((sector) => (
+              <div
+                key={sector.key}
+                className={`sector-option ${
+                  formData.sector_preferences.includes(sector.key) ? 'selected' : ''
+                }`}
+                onClick={() => !loading && handleSectorToggle(sector.key)}
+              >
+                <div className="sector-checkbox">
+                  {formData.sector_preferences.includes(sector.key) ? '✓' : ''}
+                </div>
+                <div className="sector-info">
+                  <strong>{sector.name}</strong>
+                  <small>{sector.description}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {formData.sector_preferences.length > 0 && (
+          <div className="selected-sectors-summary">
+            <strong>Selected: </strong>
+            {formData.sector_preferences.map(key => {
+              const sector = availableSectors.find(s => s.key === key);
+              return sector ? sector.name : key;
+            }).join(', ')}
+          </div>
+        )}
+        
+        {formData.sector_preferences.length === 1 && (
+          <div className="warning-message">
+            ⚠️ Single sector selection increases risk. Consider selecting 2-3 sectors for better diversification.
+          </div>
         )}
       </div>
 
