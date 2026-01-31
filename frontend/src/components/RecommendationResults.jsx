@@ -7,6 +7,11 @@ const RecommendationResults = ({ data }) => {
   const { recommendations, portfolio_summary, investment_strategy, data_source, fund_count_info } = data;
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedHoldings, setSelectedHoldings] = useState(null);
+  
+  // Debug logging
+  console.log('[RecommendationResults] Full data:', data);
+  console.log('[RecommendationResults] fund_count_info:', fund_count_info);
+  console.log('[RecommendationResults] recommendations count:', recommendations?.length);
 
   const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
