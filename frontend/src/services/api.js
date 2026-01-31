@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://sip-advisor-backend.onrender.com/api';
+const API_BASE_URL = 'https://sip-investment-advisor.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
