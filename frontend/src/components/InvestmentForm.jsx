@@ -120,7 +120,7 @@ const InvestmentForm = ({ onSubmit, loading }) => {
 
   const handleSectorToggle = (sectorKey) => {
     setFormData((prev) => {
-      const currentSectors = prev.sector_preferences || [];
+      const currentSectors = Array.isArray(prev.sector_preferences) ? prev.sector_preferences : [];
       const isSelected = currentSectors.includes(sectorKey);
       
       return {
@@ -264,27 +264,29 @@ const InvestmentForm = ({ onSubmit, loading }) => {
         
         {showSectorSelection && (
           <div className="sector-selection">
-            {availableSectors.map((sector) => (
-              <div
-                key={sector.key}
-                className={`sector-option ${
-                  formData.sector_preferences.includes(sector.key) ? 'selected' : ''
-                }`}
-                onClick={() => !loading && handleSectorToggle(sector.key)}
-              >
-                <div className="sector-checkbox">
-                  {formData.sector_preferences.includes(sector.key) ? '✓' : ''}
+            {availableSectors.map((sector) => {
+              const isSelected = Array.isArray(formData.sector_preferences) &&
+                                formData.sector_preferences.includes(sector.key);
+              return (
+                <div
+                  key={sector.key}
+                  className={`sector-option ${isSelected ? 'selected' : ''}`}
+                  onClick={() => !loading && handleSectorToggle(sector.key)}
+                >
+                  <div className="sector-checkbox">
+                    {isSelected ? '✓' : ''}
+                  </div>
+                  <div className="sector-info">
+                    <strong>{sector.name}</strong>
+                    <small>{sector.description}</small>
+                  </div>
                 </div>
-                <div className="sector-info">
-                  <strong>{sector.name}</strong>
-                  <small>{sector.description}</small>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
         
-        {formData.sector_preferences.length > 0 && (
+        {Array.isArray(formData.sector_preferences) && formData.sector_preferences.length > 0 && (
           <div className="selected-sectors-summary">
             <strong>Selected: </strong>
             {formData.sector_preferences.map(key => {
@@ -294,7 +296,7 @@ const InvestmentForm = ({ onSubmit, loading }) => {
           </div>
         )}
         
-        {formData.sector_preferences.length === 1 && (
+        {Array.isArray(formData.sector_preferences) && formData.sector_preferences.length === 1 && (
           <div className="warning-message">
             ⚠️ Single sector selection increases risk. Consider selecting 2-3 sectors for better diversification.
           </div>
