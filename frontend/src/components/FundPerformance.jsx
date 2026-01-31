@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
+import api from '../services/api';
 
 const FundPerformance = ({ fundName }) => {
   const [performanceData, setPerformanceData] = useState(null);
@@ -23,8 +23,8 @@ const FundPerformance = ({ fundName }) => {
   const fetchPerformanceData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `http://localhost:5001/api/fund-performance/${encodeURIComponent(fundName)}?period=${selectedPeriod}`
+      const response = await api.get(
+        `/fund-performance/${encodeURIComponent(fundName)}?period=${selectedPeriod}`
       );
       setPerformanceData(response.data);
       setError(null);
