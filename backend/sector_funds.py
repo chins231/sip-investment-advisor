@@ -310,21 +310,46 @@ def get_sectors_list():
         {'value': 'fmcg', 'label': 'FMCG & Consumer', 'description': 'Consumer goods, retail'}
     ]
 
-def get_sector_funds(sector_preferences):
+def get_sector_funds(sector_preferences, use_api=True):
     """
-    Get funds based on sector preferences
+    Get funds based on sector preferences with API integration and fallback
     sector_preferences: list of sector keys (e.g., ['metal', 'defense'])
+    use_api: whether to try fetching from API first (default: True)
+    
+    Returns: (funds_list, data_source_info)
     """
     if not sector_preferences or 'diversified' in sector_preferences:
-        # Return diversified funds
-        return SECTOR_FUNDS['diversified']['funds']
+        # Return diversified funds (always static)
+        return SECTOR_FUNDS['diversified']['funds'], {'source': 'static', 'reason': 'diversified_selected'}
     
-    # Collect funds from selected sectors
+    # Try API first if enabled
+    if use_api:
+        try:
+            from mf_api_service import mf_api_service
+            api_funds, is_api_data = mf_api_service.get_all_funds_for_sectors(sector_preferences)
+            
+            if is_api_data and api_funds:
+                return api_funds, {
+                    'source': 'api',
+                    'api_name': 'MFApi',
+                    'fund_count': len(api_funds),
+                    'has_live_nav': True
+                }
+        except Exception as e:
+            import logging
+            logging.error(f"API fetch failed: {e}")
+    
+    # Fallback to static data
     selected_funds = []
     for sector in sector_preferences:
         if sector in SECTOR_FUNDS:
             selected_funds.extend(SECTOR_FUNDS[sector]['funds'])
     
-    return selected_funds if selected_funds else SECTOR_FUNDS['diversified']['funds']
+    result_funds = selected_funds if selected_funds else SECTOR_FUNDS['diversified']['funds']
+    return result_funds, {
+        'source': 'static',
+        'reason': 'api_unavailable' if use_api else 'api_disabled',
+        'fund_count': len(result_funds)
+    }
 
 # Made with Bob

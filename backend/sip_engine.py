@@ -205,18 +205,25 @@ class SIPRecommendationEngine:
         
         # Generate fund recommendations
         recommendations = []
+        data_source_info = None
         
         # If sector preferences are specified, use sector-specific funds
         if sector_preferences and len(sector_preferences) > 0:
             from sector_funds import get_sector_funds
-            sector_funds = get_sector_funds(sector_preferences)
+            sector_funds, data_source_info = get_sector_funds(sector_preferences)
+            
+            # Limit to max 5 funds per sector to avoid overwhelming user
+            max_funds_per_request = 10
+            if len(sector_funds) > max_funds_per_request:
+                # Sort by expected return and take top funds
+                sector_funds = sorted(sector_funds, key=lambda x: x.get('expected_return', 0), reverse=True)[:max_funds_per_request]
             
             # Distribute allocation across sector funds
             if sector_funds:
                 allocation_per_fund = 100 / len(sector_funds)
                 for fund in sector_funds:
                     raw_monthly_investment = monthly_investment * (allocation_per_fund / 100)
-                    recommendations.append({
+                    rec = {
                         'fund_name': fund['name'],
                         'fund_type': fund['type'],
                         'allocation_percentage': allocation_per_fund,
@@ -225,7 +232,14 @@ class SIPRecommendationEngine:
                         'risk_level': fund['risk_level'],
                         'sector': fund.get('sector', 'Sector-Specific'),
                         'has_holdings': True  # Flag to show holdings button
-                    })
+                    }
+                    # Add API-specific fields if available
+                    if fund.get('is_dynamic'):
+                        rec['nav'] = fund.get('nav')
+                        rec['nav_date'] = fund.get('nav_date')
+                        rec['scheme_code'] = fund.get('scheme_code')
+                        rec['fund_house'] = fund.get('fund_house')
+                    recommendations.append(rec)
         else:
             # Use traditional diversified approach
             for category, details in returns['category_wise'].items():
@@ -253,11 +267,17 @@ class SIPRecommendationEngine:
                 raw_monthly_investment = monthly_investment * (rec['allocation_percentage'] / 100)
                 rec['monthly_investment'] = self.round_sip_amount(raw_monthly_investment)
         
-        return {
+        result = {
             'recommendations': recommendations,
             'portfolio_summary': returns['portfolio_summary'],
             'investment_strategy': self.get_investment_strategy(risk_profile, investment_years, sector_preferences)
         }
+        
+        # Add data source information if available
+        if data_source_info:
+            result['data_source'] = data_source_info
+        
+        return result
     
     def get_investment_strategy(self, risk_profile, investment_years, sector_preferences=None):
         """

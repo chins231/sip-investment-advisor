@@ -4,7 +4,7 @@ import FundPerformance from './FundPerformance';
 import FundHoldings from './FundHoldings';
 
 const RecommendationResults = ({ data }) => {
-  const { recommendations, portfolio_summary, investment_strategy } = data;
+  const { recommendations, portfolio_summary, investment_strategy, data_source } = data;
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedHoldings, setSelectedHoldings] = useState(null);
 
@@ -38,6 +38,27 @@ const RecommendationResults = ({ data }) => {
 
   return (
     <div className="results-section">
+      {/* Data Source Banner */}
+      {data_source && (
+        <div className={`data-source-banner ${data_source.source === 'api' ? 'api-data' : 'static-data'}`}>
+          {data_source.source === 'api' ? (
+            <>
+              <span className="badge-success">✓ Live Data</span>
+              <span>Showing {data_source.fund_count} funds with real-time NAV from {data_source.api_name}</span>
+            </>
+          ) : (
+            <>
+              <span className="badge-warning">⚠ Static Data</span>
+              <span>
+                {data_source.reason === 'api_unavailable'
+                  ? 'API temporarily unavailable. Showing curated fund recommendations.'
+                  : `Showing ${data_source.fund_count} curated funds.`}
+              </span>
+            </>
+          )}
+        </div>
+      )}
+      
       <div className="card">
         <h2>📊 Portfolio Summary</h2>
         <div className="summary-grid">

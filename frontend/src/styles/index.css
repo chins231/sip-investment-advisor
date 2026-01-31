@@ -479,3 +479,45 @@ body {
 .btn-link:hover {
   color: #1d4ed8;
 }
+
+/* Data Source Banner Styles */
+.data-source-banner {
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow);
+}
+
+.data-source-banner.api-data {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-left: 4px solid var(--secondary-color);
+  color: #065f46;
+}
+
+.data-source-banner.static-data {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left: 4px solid var(--warning-color);
+  color: #92400e;
+}
+
+.badge-success {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.badge-warning {
+  background-color: var(--warning-color);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
