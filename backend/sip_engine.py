@@ -1,0 +1,278 @@
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+import yfinance as yf
+
+class SIPRecommendationEngine:
+    """
+    Engine to recommend SIP investments based on user risk profile and investment duration
+    """
+    
+    def __init__(self):
+        # Define fund categories with Indian mutual funds focus
+        self.fund_categories = {
+            'low_risk': {
+                'debt_funds': {
+                    'allocation': 70,
+                    'expected_return': 7.5,
+                    'funds': [
+                        'HDFC Short Term Debt Fund',
+                        'ICICI Prudential Corporate Bond Fund',
+                        'Axis Banking & PSU Debt Fund'
+                    ]
+                },
+                'hybrid_funds': {
+                    'allocation': 20,
+                    'expected_return': 9.0,
+                    'funds': [
+                        'HDFC Hybrid Debt Fund',
+                        'ICICI Prudential Equity & Debt Fund'
+                    ]
+                },
+                'equity_funds': {
+                    'allocation': 10,
+                    'expected_return': 12.0,
+                    'funds': [
+                        'HDFC Index Fund - Nifty 50',
+                        'UTI Nifty Index Fund'
+                    ]
+                }
+            },
+            'medium_risk': {
+                'debt_funds': {
+                    'allocation': 40,
+                    'expected_return': 7.5,
+                    'funds': [
+                        'HDFC Corporate Bond Fund',
+                        'Axis Corporate Debt Fund'
+                    ]
+                },
+                'hybrid_funds': {
+                    'allocation': 30,
+                    'expected_return': 10.0,
+                    'funds': [
+                        'HDFC Balanced Advantage Fund',
+                        'ICICI Prudential Balanced Advantage Fund'
+                    ]
+                },
+                'equity_funds': {
+                    'allocation': 30,
+                    'expected_return': 13.5,
+                    'funds': [
+                        'Axis Bluechip Fund',
+                        'Mirae Asset Large Cap Fund',
+                        'HDFC Top 100 Fund'
+                    ]
+                }
+            },
+            'high_risk': {
+                'debt_funds': {
+                    'allocation': 10,
+                    'expected_return': 7.5,
+                    'funds': [
+                        'HDFC Short Term Debt Fund'
+                    ]
+                },
+                'hybrid_funds': {
+                    'allocation': 20,
+                    'expected_return': 11.0,
+                    'funds': [
+                        'HDFC Balanced Advantage Fund'
+                    ]
+                },
+                'equity_funds': {
+                    'allocation': 70,
+                    'expected_return': 15.0,
+                    'funds': [
+                        'Axis Bluechip Fund',
+                        'Parag Parikh Flexi Cap Fund',
+                        'Mirae Asset Emerging Bluechip Fund',
+                        'Axis Midcap Fund',
+                        'Kotak Small Cap Fund'
+                    ]
+                }
+            }
+        }
+    
+    def adjust_allocation_by_duration(self, risk_profile, investment_years):
+        """
+        Adjust asset allocation based on investment duration
+        Longer duration allows for more equity exposure
+        """
+        base_allocation = self.fund_categories[risk_profile].copy()
+        
+        if investment_years >= 10:
+            # Long term - can take more risk
+            if risk_profile == 'low_risk':
+                base_allocation['equity_funds']['allocation'] = 20
+                base_allocation['hybrid_funds']['allocation'] = 30
+                base_allocation['debt_funds']['allocation'] = 50
+            elif risk_profile == 'medium_risk':
+                base_allocation['equity_funds']['allocation'] = 40
+                base_allocation['hybrid_funds']['allocation'] = 30
+                base_allocation['debt_funds']['allocation'] = 30
+        elif investment_years <= 3:
+            # Short term - reduce risk
+            if risk_profile == 'high_risk':
+                base_allocation['equity_funds']['allocation'] = 50
+                base_allocation['hybrid_funds']['allocation'] = 30
+                base_allocation['debt_funds']['allocation'] = 20
+            elif risk_profile == 'medium_risk':
+                base_allocation['equity_funds']['allocation'] = 20
+                base_allocation['hybrid_funds']['allocation'] = 30
+                base_allocation['debt_funds']['allocation'] = 50
+        
+        return base_allocation
+    
+    def calculate_expected_returns(self, monthly_investment, investment_years, allocation):
+        """
+        Calculate expected returns based on SIP investment
+        """
+        total_months = investment_years * 12
+        results = {}
+        
+        for category, details in allocation.items():
+            annual_return = details['expected_return'] / 100
+            monthly_return = annual_return / 12
+            
+            # SIP Future Value calculation
+            future_value = monthly_investment * (
+                ((1 + monthly_return) ** total_months - 1) / monthly_return
+            ) * (1 + monthly_return)
+            
+            allocation_amount = monthly_investment * (details['allocation'] / 100)
+            category_future_value = future_value * (details['allocation'] / 100)
+            
+            results[category] = {
+                'monthly_investment': allocation_amount,
+                'total_invested': allocation_amount * total_months,
+                'expected_value': category_future_value,
+                'expected_return_percentage': details['expected_return'],
+                'allocation_percentage': details['allocation'],
+                'funds': details['funds']
+            }
+        
+        # Calculate overall portfolio
+        total_invested = monthly_investment * total_months
+        total_expected_value = sum(r['expected_value'] for r in results.values())
+        total_gains = total_expected_value - total_invested
+        
+        return {
+            'category_wise': results,
+            'portfolio_summary': {
+                'total_monthly_investment': monthly_investment,
+                'total_invested': total_invested,
+                'expected_portfolio_value': total_expected_value,
+                'expected_gains': total_gains,
+                'overall_return_percentage': (total_gains / total_invested) * 100
+            }
+        }
+    
+    def generate_recommendations(self, risk_profile, investment_years, monthly_investment, max_funds=None):
+        """
+        Generate complete SIP recommendations
+        """
+        # Validate inputs
+        if risk_profile not in ['low_risk', 'medium_risk', 'high_risk']:
+            raise ValueError("Risk profile must be 'low_risk', 'medium_risk', or 'high_risk'")
+        
+        if investment_years < 1 or investment_years > 30:
+            raise ValueError("Investment years must be between 1 and 30")
+        
+        if monthly_investment < 500:
+            raise ValueError("Minimum monthly investment should be ₹500")
+        
+        if max_funds is not None and (max_funds < 1 or max_funds > 15):
+            raise ValueError("Maximum funds must be between 1 and 15")
+        
+        # Get adjusted allocation
+        allocation = self.adjust_allocation_by_duration(risk_profile, investment_years)
+        
+        # Calculate returns
+        returns = self.calculate_expected_returns(monthly_investment, investment_years, allocation)
+        
+        # Generate fund recommendations
+        recommendations = []
+        for category, details in returns['category_wise'].items():
+            for fund in details['funds']:
+                recommendations.append({
+                    'fund_name': fund,
+                    'fund_type': category.replace('_', ' ').title(),
+                    'allocation_percentage': details['allocation_percentage'] / len(details['funds']),
+                    'monthly_investment': details['monthly_investment'] / len(details['funds']),
+                    'expected_return': details['expected_return_percentage'],
+                    'risk_level': risk_profile.replace('_', ' ').title()
+                })
+        
+        # Limit number of funds if max_funds is specified
+        if max_funds is not None and len(recommendations) > max_funds:
+            # Sort by allocation percentage (highest first) and take top max_funds
+            recommendations = sorted(recommendations, key=lambda x: x['allocation_percentage'], reverse=True)[:max_funds]
+            
+            # Recalculate allocations to sum to 100%
+            total_allocation = sum(r['allocation_percentage'] for r in recommendations)
+            for rec in recommendations:
+                rec['allocation_percentage'] = (rec['allocation_percentage'] / total_allocation) * 100
+                rec['monthly_investment'] = monthly_investment * (rec['allocation_percentage'] / 100)
+        
+        return {
+            'recommendations': recommendations,
+            'portfolio_summary': returns['portfolio_summary'],
+            'investment_strategy': self.get_investment_strategy(risk_profile, investment_years)
+        }
+    
+    def get_investment_strategy(self, risk_profile, investment_years):
+        """
+        Provide investment strategy advice
+        """
+        strategies = {
+            'low_risk': {
+                'short': 'Focus on capital preservation with debt funds. Minimal equity exposure.',
+                'medium': 'Balanced approach with majority in debt, some hybrid funds for growth.',
+                'long': 'Gradual equity exposure while maintaining debt foundation for stability.'
+            },
+            'medium_risk': {
+                'short': 'Balanced portfolio with equal focus on stability and growth.',
+                'medium': 'Diversified across debt, hybrid, and equity for optimal risk-return.',
+                'long': 'Increased equity allocation to maximize long-term wealth creation.'
+            },
+            'high_risk': {
+                'short': 'Aggressive but cautious - higher equity with safety net.',
+                'medium': 'Equity-focused portfolio with diversification across market caps.',
+                'long': 'Maximum equity exposure across large, mid, and small cap funds.'
+            }
+        }
+        
+        duration_key = 'short' if investment_years <= 3 else 'long' if investment_years >= 10 else 'medium'
+        
+        return {
+            'strategy': strategies[risk_profile][duration_key],
+            'rebalancing': 'Review and rebalance portfolio annually',
+            'sip_benefits': [
+                'Rupee cost averaging reduces market timing risk',
+                'Disciplined investment approach',
+                'Power of compounding over time',
+                'Flexibility to increase SIP amount'
+            ]
+        }
+
+# Example usage
+if __name__ == '__main__':
+    engine = SIPRecommendationEngine()
+    
+    # Test case
+    result = engine.generate_recommendations(
+        risk_profile='medium_risk',
+        investment_years=10,
+        monthly_investment=10000
+    )
+    
+    print("SIP Recommendations:")
+    print(f"\nPortfolio Summary:")
+    print(f"Total Investment: ₹{result['portfolio_summary']['total_invested']:,.2f}")
+    print(f"Expected Value: ₹{result['portfolio_summary']['expected_portfolio_value']:,.2f}")
+    print(f"Expected Gains: ₹{result['portfolio_summary']['expected_gains']:,.2f}")
+    print(f"\nRecommended Funds:")
+    for rec in result['recommendations']:
+        print(f"- {rec['fund_name']} ({rec['allocation_percentage']:.1f}%)")
+

@@ -1,0 +1,190 @@
+import React, { useState } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import FundPerformance from './FundPerformance';
+
+const RecommendationResults = ({ data }) => {
+  const { recommendations, portfolio_summary, investment_strategy } = data;
+  const [selectedFund, setSelectedFund] = useState(null);
+
+  const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+  // Prepare data for pie chart
+  const chartData = recommendations.reduce((acc, rec) => {
+    const existing = acc.find((item) => item.name === rec.fund_type);
+    if (existing) {
+      existing.value += rec.allocation_percentage;
+    } else {
+      acc.push({
+        name: rec.fund_type,
+        value: rec.allocation_percentage,
+      });
+    }
+    return acc;
+  }, []);
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatPercentage = (value) => {
+    return `${value.toFixed(2)}%`;
+  };
+
+  return (
+    <div className="results-section">
+      <div className="card">
+        <h2>📊 Portfolio Summary</h2>
+        <div className="summary-grid">
+          <div className="summary-card">
+            <h3>Monthly Investment</h3>
+            <div className="value">
+              {formatCurrency(portfolio_summary.total_monthly_investment)}
+            </div>
+            <div className="subtext">Per month</div>
+          </div>
+          <div className="summary-card">
+            <h3>Total Investment</h3>
+            <div className="value">
+              {formatCurrency(portfolio_summary.total_invested)}
+            </div>
+            <div className="subtext">Over investment period</div>
+          </div>
+          <div className="summary-card">
+            <h3>Expected Value</h3>
+            <div className="value">
+              {formatCurrency(portfolio_summary.expected_portfolio_value)}
+            </div>
+            <div className="subtext">At maturity</div>
+          </div>
+          <div className="summary-card">
+            <h3>Expected Gains</h3>
+            <div className="value">
+              {formatCurrency(portfolio_summary.expected_gains)}
+            </div>
+            <div className="subtext">
+              {formatPercentage(portfolio_summary.overall_return_percentage)} returns
+            </div>
+          </div>
+        </div>
+
+        <div style={{ marginTop: '2rem' }}>
+          <h3 style={{ marginBottom: '1rem' }}>Asset Allocation</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, value }) => `${name}: ${value.toFixed(1)}%`}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>💼 Recommended SIP Funds</h2>
+        <div className="recommendations-list">
+          {recommendations.map((rec, index) => (
+            <div key={index} className="recommendation-item">
+              <div className="recommendation-header">
+                <h3>{rec.fund_name}</h3>
+                <span className="allocation-badge">
+                  {formatPercentage(rec.allocation_percentage)}
+                </span>
+              </div>
+              <div className="recommendation-details">
+                <div className="detail-item">
+                  <label>Fund Type</label>
+                  <value>{rec.fund_type}</value>
+                </div>
+                <div className="detail-item">
+                  <label>Expected Return</label>
+                  <value>{formatPercentage(rec.expected_return)}</value>
+                </div>
+                <div className="detail-item">
+                  <label>Risk Level</label>
+                  <value>{rec.risk_level}</value>
+                </div>
+                <div className="detail-item">
+                  <label>Monthly SIP</label>
+                  <value>{formatCurrency(rec.monthly_investment)}</value>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedFund(selectedFund === rec.fund_name ? null : rec.fund_name)}
+                style={{
+                  marginTop: '1rem',
+                  padding: '0.75rem 1.5rem',
+                  background: selectedFund === rec.fund_name ? '#ef4444' : '#2563eb',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  transition: 'all 0.3s'
+                }}
+              >
+                {selectedFund === rec.fund_name ? '✕ Hide Details' : '📊 View Performance & Reviews'}
+              </button>
+              {selectedFund === rec.fund_name && (
+                <FundPerformance fundName={rec.fund_name} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {investment_strategy && (
+        <div className="card">
+          <h2>📈 Investment Strategy</h2>
+          <div className="strategy-section">
+            <h3>Recommended Approach</h3>
+            <p style={{ marginBottom: '1rem', lineHeight: '1.8' }}>
+              {investment_strategy.strategy}
+            </p>
+
+            <h3>Key Benefits of SIP</h3>
+            <ul>
+              {investment_strategy.sip_benefits.map((benefit, index) => (
+                <li key={index}>{benefit}</li>
+              ))}
+            </ul>
+
+            <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#fff3cd', borderRadius: '8px' }}>
+              <strong>💡 Pro Tip:</strong> {investment_strategy.rebalancing}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="card" style={{ background: '#f0f9ff', border: '2px solid #2563eb' }}>
+        <h2>⚠️ Important Disclaimer</h2>
+        <p style={{ lineHeight: '1.8', color: '#1e293b' }}>
+          These recommendations are based on historical data and mathematical projections. 
+          Actual returns may vary based on market conditions. Past performance is not indicative 
+          of future results. Please consult with a certified financial advisor before making 
+          investment decisions. Mutual fund investments are subject to market risks. 
+          Read all scheme-related documents carefully before investing.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default RecommendationResults;
+

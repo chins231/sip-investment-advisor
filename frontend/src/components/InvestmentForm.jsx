@@ -1,0 +1,226 @@
+import React, { useState } from 'react';
+
+const InvestmentForm = ({ onSubmit, loading }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    risk_profile: '',
+    investment_years: 5,
+    monthly_investment: 5000,
+    max_funds: 5,
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const riskProfiles = [
+    {
+      value: 'low',
+      title: 'Conservative',
+      description: 'Low risk, stable returns. Focus on capital preservation.',
+      icon: '🛡️',
+    },
+    {
+      value: 'medium',
+      title: 'Balanced',
+      description: 'Moderate risk, balanced growth. Mix of stability and returns.',
+      icon: '⚖️',
+    },
+    {
+      value: 'high',
+      title: 'Aggressive',
+      description: 'High risk, high returns. Focus on wealth creation.',
+      icon: '🚀',
+    },
+  ];
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+
+    if (!formData.risk_profile) {
+      newErrors.risk_profile = 'Please select a risk profile';
+    }
+
+    if (formData.investment_years < 1 || formData.investment_years > 30) {
+      newErrors.investment_years = 'Investment years must be between 1 and 30';
+    }
+
+    if (formData.monthly_investment < 500) {
+      newErrors.monthly_investment = 'Minimum investment is ₹500';
+    }
+
+    if (formData.max_funds < 1 || formData.max_funds > 15) {
+      newErrors.max_funds = 'Number of funds must be between 1 and 15';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onSubmit(formData);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
+  };
+
+  const handleRiskSelect = (risk) => {
+    setFormData((prev) => ({
+      ...prev,
+      risk_profile: risk,
+    }));
+    if (errors.risk_profile) {
+      setErrors((prev) => ({
+        ...prev,
+        risk_profile: '',
+      }));
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="investment-form">
+      <div className="form-group">
+        <label htmlFor="name">Full Name *</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Enter your full name"
+          disabled={loading}
+        />
+        {errors.name && <small className="error">{errors.name}</small>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="email">Email Address *</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="your.email@example.com"
+          disabled={loading}
+        />
+        {errors.email && <small className="error">{errors.email}</small>}
+      </div>
+
+      <div className="form-group">
+        <label>Risk Profile *</label>
+        <div className="risk-selector">
+          {riskProfiles.map((profile) => (
+            <div
+              key={profile.value}
+              className={`risk-option risk-${profile.value} ${
+                formData.risk_profile === profile.value ? 'selected' : ''
+              }`}
+              onClick={() => !loading && handleRiskSelect(profile.value)}
+            >
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+                {profile.icon}
+              </div>
+              <h3>{profile.title}</h3>
+              <p>{profile.description}</p>
+            </div>
+          ))}
+        </div>
+        {errors.risk_profile && (
+          <small className="error">{errors.risk_profile}</small>
+        )}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="investment_years">
+          Investment Duration (Years) *
+        </label>
+        <input
+          type="number"
+          id="investment_years"
+          name="investment_years"
+          value={formData.investment_years}
+          onChange={handleChange}
+          min="1"
+          max="30"
+          disabled={loading}
+        />
+        <small>Choose between 1 to 30 years</small>
+        {errors.investment_years && (
+          <small className="error">{errors.investment_years}</small>
+        )}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="monthly_investment">
+          Monthly Investment Amount (₹) *
+        </label>
+        <input
+          type="number"
+          id="monthly_investment"
+          name="monthly_investment"
+          value={formData.monthly_investment}
+          onChange={handleChange}
+          min="500"
+          step="500"
+          disabled={loading}
+        />
+        <small>Minimum ₹500 per month</small>
+        {errors.monthly_investment && (
+          <small className="error">{errors.monthly_investment}</small>
+        )}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="max_funds">
+          Maximum Number of Funds to Recommend *
+        </label>
+        <input
+          type="number"
+          id="max_funds"
+          name="max_funds"
+          value={formData.max_funds}
+          onChange={handleChange}
+          min="1"
+          max="15"
+          disabled={loading}
+        />
+        <small>Choose between 1 to 15 funds (Recommended: 3-7 for diversification)</small>
+        {errors.max_funds && (
+          <small className="error">{errors.max_funds}</small>
+        )}
+      </div>
+
+      <button type="submit" className="btn btn-primary" disabled={loading}>
+        {loading ? 'Generating Recommendations...' : 'Get SIP Recommendations'}
+      </button>
+    </form>
+  );
+};
+
+export default InvestmentForm;
+
