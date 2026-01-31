@@ -11,7 +11,7 @@ SECTOR_FUNDS = {
                 'type': 'ETF',
                 'expected_return': 18.0,
                 'risk_level': 'Very High',
-                'holdings_url': 'https://www.nipponindiaetf.com/metal-etf',
+                'holdings_url': 'https://mf.nipponindiaim.com/FundsAndPerformance/Pages/Nippon-India-ETF-Nifty-Metal.aspx',
                 'top_holdings': [
                     {'company': 'Tata Steel', 'percentage': 22.5},
                     {'company': 'Hindalco Industries', 'percentage': 18.3},
@@ -26,7 +26,7 @@ SECTOR_FUNDS = {
                 'type': 'Equity Fund',
                 'expected_return': 16.5,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.sbimf.com/psu-fund',
+                'holdings_url': 'https://www.sbimf.com/en-us/individual/our-funds/equity-funds/sbi-psu-fund',
                 'top_holdings': [
                     {'company': 'NTPC', 'percentage': 8.5},
                     {'company': 'Coal India', 'percentage': 7.8},
@@ -46,7 +46,7 @@ SECTOR_FUNDS = {
                 'type': 'Index Fund',
                 'expected_return': 20.0,
                 'risk_level': 'Very High',
-                'holdings_url': 'https://www.motilaloswalmf.com/defence-fund',
+                'holdings_url': 'https://www.motilaloswalmf.com/mf/nifty-india-defence-index-fund',
                 'top_holdings': [
                     {'company': 'Hindustan Aeronautics (HAL)', 'percentage': 25.3},
                     {'company': 'Bharat Electronics (BEL)', 'percentage': 22.7},
@@ -61,7 +61,7 @@ SECTOR_FUNDS = {
                 'type': 'Equity Fund',
                 'expected_return': 16.5,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.sbimf.com/psu-fund',
+                'holdings_url': 'https://www.sbimf.com/en-us/individual/our-funds/equity-funds/sbi-psu-fund',
                 'top_holdings': [
                     {'company': 'Bharat Electronics', 'percentage': 6.5},
                     {'company': 'NTPC', 'percentage': 8.5},
@@ -81,7 +81,7 @@ SECTOR_FUNDS = {
                 'type': 'Sectoral Fund',
                 'expected_return': 17.5,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.icicipruamc.com/technology-fund',
+                'holdings_url': 'https://www.icicipruamc.com/mutual-fund/equity-funds/icici-prudential-technology-fund',
                 'top_holdings': [
                     {'company': 'TCS', 'percentage': 18.5},
                     {'company': 'Infosys', 'percentage': 16.8},
@@ -96,7 +96,7 @@ SECTOR_FUNDS = {
                 'type': 'ETF',
                 'expected_return': 16.0,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.nipponindiaetf.com/it-etf',
+                'holdings_url': 'https://mf.nipponindiaim.com/FundsAndPerformance/Pages/Nippon-India-ETF-Nifty-IT.aspx',
                 'top_holdings': [
                     {'company': 'TCS', 'percentage': 20.3},
                     {'company': 'Infosys', 'percentage': 18.9},
@@ -116,7 +116,7 @@ SECTOR_FUNDS = {
                 'type': 'Sectoral Fund',
                 'expected_return': 15.5,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.nipponindiaetf.com/pharma-fund',
+                'holdings_url': 'https://mf.nipponindiaim.com/FundsAndPerformance/Pages/Nippon-India-Pharma-Fund.aspx',
                 'top_holdings': [
                     {'company': 'Sun Pharma', 'percentage': 15.8},
                     {'company': 'Divi\'s Laboratories', 'percentage': 12.4},
@@ -131,7 +131,7 @@ SECTOR_FUNDS = {
                 'type': 'Sectoral Fund',
                 'expected_return': 16.0,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.sbimf.com/healthcare-fund',
+                'holdings_url': 'https://www.sbimf.com/en-us/individual/our-funds/equity-funds/sbi-healthcare-opportunities-fund',
                 'top_holdings': [
                     {'company': 'Sun Pharma', 'percentage': 14.2},
                     {'company': 'Apollo Hospitals', 'percentage': 11.8},
@@ -151,7 +151,7 @@ SECTOR_FUNDS = {
                 'type': 'Sectoral Fund',
                 'expected_return': 16.5,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.icicipruamc.com/banking-fund',
+                'holdings_url': 'https://www.icicipruamc.com/mutual-fund/equity-funds/icici-prudential-banking-and-financial-services-fund',
                 'top_holdings': [
                     {'company': 'HDFC Bank', 'percentage': 18.5},
                     {'company': 'ICICI Bank', 'percentage': 16.2},
@@ -166,7 +166,7 @@ SECTOR_FUNDS = {
                 'type': 'ETF',
                 'expected_return': 15.0,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.nipponindiaetf.com/bank-bees',
+                'holdings_url': 'https://mf.nipponindiaim.com/FundsAndPerformance/Pages/Nippon-India-ETF-Bank-BeES.aspx',
                 'top_holdings': [
                     {'company': 'HDFC Bank', 'percentage': 28.5},
                     {'company': 'ICICI Bank', 'percentage': 22.3},
@@ -186,7 +186,7 @@ SECTOR_FUNDS = {
                 'type': 'Thematic Fund',
                 'expected_return': 17.0,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.tatamutualfund.com/digital-india',
+                'holdings_url': 'https://www.tatamutualfund.com/fund/tata-digital-india-fund',
                 'top_holdings': [
                     {'company': 'Maruti Suzuki', 'percentage': 12.5},
                     {'company': 'Mahindra & Mahindra', 'percentage': 10.8},
@@ -206,7 +206,7 @@ SECTOR_FUNDS = {
                 'type': 'Sectoral Fund',
                 'expected_return': 18.0,
                 'risk_level': 'Very High',
-                'holdings_url': 'https://www.icicipruamc.com/infrastructure-fund',
+                'holdings_url': 'https://www.icicipruamc.com/mutual-fund/equity-funds/icici-prudential-infrastructure-fund',
                 'top_holdings': [
                     {'company': 'Larsen & Toubro', 'percentage': 15.8},
                     {'company': 'UltraTech Cement', 'percentage': 12.4},
@@ -226,7 +226,7 @@ SECTOR_FUNDS = {
                 'type': 'Equity Fund',
                 'expected_return': 16.5,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.sbimf.com/psu-fund',
+                'holdings_url': 'https://www.sbimf.com/en-us/individual/our-funds/equity-funds/sbi-psu-fund',
                 'top_holdings': [
                     {'company': 'NTPC', 'percentage': 8.5},
                     {'company': 'Power Grid', 'percentage': 7.2},
@@ -246,7 +246,7 @@ SECTOR_FUNDS = {
                 'type': 'ETF',
                 'expected_return': 14.0,
                 'risk_level': 'Medium',
-                'holdings_url': 'https://www.nipponindiaetf.com/fmcg-etf',
+                'holdings_url': 'https://mf.nipponindiaim.com/FundsAndPerformance/Pages/Nippon-India-ETF-Nifty-FMCG.aspx',
                 'top_holdings': [
                     {'company': 'Hindustan Unilever', 'percentage': 32.5},
                     {'company': 'ITC', 'percentage': 18.7},
@@ -266,7 +266,7 @@ SECTOR_FUNDS = {
                 'type': 'Large Cap Fund',
                 'expected_return': 15.0,
                 'risk_level': 'Medium-High',
-                'holdings_url': 'https://www.axismf.com/bluechip-fund',
+                'holdings_url': 'https://www.axismf.com/mutual-fund/equity-fund/axis-bluechip-fund',
                 'top_holdings': [
                     {'company': 'HDFC Bank', 'percentage': 8.5},
                     {'company': 'ICICI Bank', 'percentage': 7.2},
@@ -281,7 +281,7 @@ SECTOR_FUNDS = {
                 'type': 'Flexi Cap Fund',
                 'expected_return': 15.0,
                 'risk_level': 'High',
-                'holdings_url': 'https://www.ppfas.com/flexi-cap-fund',
+                'holdings_url': 'https://www.ppfas.com/schemes/parag-parikh-flexi-cap-fund/',
                 'top_holdings': [
                     {'company': 'Alphabet (Google)', 'percentage': 8.2},
                     {'company': 'Microsoft', 'percentage': 7.5},
