@@ -267,6 +267,17 @@ const InvestmentForm = ({ onSubmit, loading }) => {
             {availableSectors.map((sector) => {
               const isSelected = Array.isArray(formData.sector_preferences) &&
                                 formData.sector_preferences.includes(sector.key);
+              
+              // Debug logging
+              if (sector.key === 'metal') {
+                console.log('Metal sector check:', {
+                  sectorKey: sector.key,
+                  sectorPreferences: formData.sector_preferences,
+                  isArray: Array.isArray(formData.sector_preferences),
+                  isSelected: isSelected
+                });
+              }
+              
               return (
                 <div
                   key={sector.key}
