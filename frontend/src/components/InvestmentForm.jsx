@@ -269,6 +269,14 @@ const InvestmentForm = ({ onSubmit, loading }) => {
               const sectorPrefs = formData.sector_preferences || [];
               const isSelected = Array.isArray(sectorPrefs) && sectorPrefs.length > 0 && sectorPrefs.includes(sector.key);
               
+              // Force log to console
+              console.log(`[v2.1] Sector ${sector.key}:`, {
+                sectorPrefs,
+                length: sectorPrefs.length,
+                includes: sectorPrefs.includes(sector.key),
+                isSelected
+              });
+              
               return (
                 <div
                   key={sector.key}
