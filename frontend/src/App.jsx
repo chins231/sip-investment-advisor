@@ -10,6 +10,7 @@ function App() {
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [userName, setUserName] = useState('');
 
   const handleFormSubmit = async (formData) => {
     setLoading(true);
@@ -20,6 +21,7 @@ function App() {
       const data = await generateRecommendations(formData);
       setResults(data);
       setUserId(data.user_id);
+      setUserName(formData.name);
     } catch (err) {
       setError(err.toString());
       console.error('Error generating recommendations:', err);
@@ -32,6 +34,7 @@ function App() {
     setResults(null);
     setError(null);
     setUserId(null);
+    setUserName('');
   };
 
   return (
@@ -71,8 +74,26 @@ function App() {
           {results && !loading && (
             <>
               <div className="success">
-                <strong>Success!</strong> Your personalized SIP recommendations are
-                ready. User ID: {userId}
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <strong>Hi {userName}! 👋</strong>
+                </div>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  Your personalized SIP recommendations are ready. Thank you for trusting us with your investment planning!
+                </div>
+                <div style={{
+                  fontSize: '0.9rem',
+                  color: '#059669',
+                  marginTop: '0.75rem',
+                  padding: '0.5rem',
+                  background: '#d1fae5',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span>🔒</span>
+                  <span><strong>Privacy:</strong> Your information is processed securely and never shared with third parties.</span>
+                </div>
               </div>
               <RecommendationResults data={results} />
               
