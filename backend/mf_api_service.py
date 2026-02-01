@@ -177,7 +177,7 @@ class MFApiService:
     
     def get_all_funds_for_sectors(self, sectors: List[str]) -> tuple[List[Dict], bool]:
         """
-        Get funds for multiple sectors
+        Get funds for multiple sectors with deduplication
         Returns: (funds_list, is_api_data)
         """
         # Check API availability first
@@ -186,12 +186,22 @@ class MFApiService:
             return [], False
         
         all_funds = []
+        seen_scheme_codes = set()
+        
         for sector in sectors:
             sector_funds = self.get_sector_funds_dynamic(sector)
-            all_funds.extend(sector_funds)
+            # Deduplicate by scheme_code
+            for fund in sector_funds:
+                scheme_code = fund.get('scheme_code')
+                if scheme_code and scheme_code not in seen_scheme_codes:
+                    seen_scheme_codes.add(scheme_code)
+                    all_funds.append(fund)
+                elif not scheme_code:
+                    # If no scheme_code, add anyway (shouldn't happen with API data)
+                    all_funds.append(fund)
         
         if all_funds:
-            logger.info(f"Successfully fetched {len(all_funds)} funds from API")
+            logger.info(f"Successfully fetched {len(all_funds)} unique funds from API (deduplicated)")
             return all_funds, True
         else:
             logger.warning("No funds fetched from API, will use fallback")

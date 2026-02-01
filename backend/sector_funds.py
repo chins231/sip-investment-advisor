@@ -339,11 +339,18 @@ def get_sector_funds(sector_preferences, use_api=True):
             import logging
             logging.error(f"API fetch failed: {e}")
     
-    # Fallback to static data
+    # Fallback to static data with deduplication
     selected_funds = []
+    seen_fund_names = set()
+    
     for sector in sector_preferences:
         if sector in SECTOR_FUNDS:
-            selected_funds.extend(SECTOR_FUNDS[sector]['funds'])
+            for fund in SECTOR_FUNDS[sector]['funds']:
+                # Deduplicate by fund name (static data doesn't have scheme_code)
+                fund_name = fund.get('name', '')
+                if fund_name and fund_name not in seen_fund_names:
+                    seen_fund_names.add(fund_name)
+                    selected_funds.append(fund)
     
     result_funds = selected_funds if selected_funds else SECTOR_FUNDS['diversified']['funds']
     return result_funds, {
