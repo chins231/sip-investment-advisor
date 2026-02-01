@@ -227,10 +227,10 @@ const RecommendationResults = ({ data }) => {
                   {selectedHoldings === rec.fund_name ? '✕ Hide Holdings' : '🏢 View Holdings'}
                 </button>
                 
-                {/* Show fund website link when NAV is unavailable */}
-                {!rec.nav && rec.holdings_url && (
+                {/* Only show fund website link if we have scheme_code (verified API data) */}
+                {!rec.nav && rec.scheme_code && (
                   <a
-                    href={rec.holdings_url}
+                    href={`https://www.moneycontrol.com/mutual-funds/nav/scheme-name/${rec.scheme_code}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -246,7 +246,7 @@ const RecommendationResults = ({ data }) => {
                       transition: 'all 0.3s'
                     }}
                   >
-                    🔗 Visit Fund Website
+                    🔗 Check NAV on Moneycontrol
                   </a>
                 )}
               </div>
