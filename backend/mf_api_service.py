@@ -211,6 +211,44 @@ class MFApiService:
         else:
             logger.warning("No funds fetched from API, will use fallback")
             return [], False
+    def get_nav_by_fund_name(self, fund_name: str) -> Optional[float]:
+        """
+        Get NAV for a fund by searching through all sector funds
+        Returns NAV if found, None otherwise
+        """
+        # Search through all cached funds first
+        for cache_key, cached_data in self.cache.items():
+            if cache_key.startswith('fund_'):
+                try:
+                    cached_name = cached_data.get('meta', {}).get('scheme_name', '')
+                    if cached_name and fund_name.lower() in cached_name.lower():
+                        latest_nav = float(cached_data['data'][0]['nav']) if cached_data.get('data') else None
+                        if latest_nav:
+                            logger.info(f"Found NAV {latest_nav} for {fund_name} in cache")
+                            return latest_nav
+                except Exception as e:
+                    logger.debug(f"Error checking cached fund: {e}")
+                    continue
+        
+        # If not in cache, search through all sector funds
+        for sector_codes in self.SECTOR_FUND_CODES.values():
+            for scheme_code in sector_codes:
+                fund_data = self.fetch_fund_details(scheme_code)
+                if fund_data:
+                    try:
+                        scheme_name = fund_data.get('meta', {}).get('scheme_name', '')
+                        if scheme_name and fund_name.lower() in scheme_name.lower():
+                            latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else None
+                            if latest_nav:
+                                logger.info(f"Found NAV {latest_nav} for {fund_name} via API search")
+                                return latest_nav
+                    except Exception as e:
+                        logger.debug(f"Error parsing fund data: {e}")
+                        continue
+        
+        logger.warning(f"Could not find NAV for fund: {fund_name}")
+        return None
+
 
 # Global instance
 mf_api_service = MFApiService()

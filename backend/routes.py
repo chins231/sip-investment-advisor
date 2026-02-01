@@ -105,9 +105,12 @@ def generate_recommendations():
             'investment_strategy': recommendations['investment_strategy']
         }
         
-        # Include data_source if available
+        # Include data_source if available and update fund_count to actual displayed count
         if 'data_source' in recommendations:
-            response_data['data_source'] = recommendations['data_source']
+            data_source = recommendations['data_source'].copy()
+            # Update fund_count to reflect actual displayed recommendations
+            data_source['fund_count'] = len(enriched_recommendations)
+            response_data['data_source'] = data_source
         
         # Include fund_count_info if available
         if 'fund_count_info' in recommendations:

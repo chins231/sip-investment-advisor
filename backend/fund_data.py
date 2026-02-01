@@ -1,19 +1,19 @@
 """
-Fund Data Module - Simulates real-time fund data
-In production, this would fetch from actual APIs like MFApi or RapidAPI
+Fund Data Module - Fetches real-time fund data from MFApi with fallback
 """
 
 import random
 from datetime import datetime, timedelta
+import logging
 
 class FundDataService:
     """
     Service to provide fund performance data, NAV, and reviews
-    Note: This uses simulated data. In production, integrate with real APIs.
+    Integrates with MFApi for real-time data with static fallback
     """
     
     def __init__(self):
-        # Simulated NAV data for demonstration
+        # Fallback NAV data for funds not in MFApi
         self.fund_nav_data = {
             'HDFC Short Term Debt Fund': 25.43,
             'ICICI Prudential Corporate Bond Fund': 22.87,
@@ -34,9 +34,29 @@ class FundDataService:
             'Axis Midcap Fund': 98.76,
             'Kotak Small Cap Fund': 234.12
         }
+        # Cache for MFApi NAV data
+        self._nav_cache = {}
     
     def get_current_nav(self, fund_name):
-        """Get current NAV for a fund"""
+        """
+        Get current NAV for a fund
+        Tries MFApi first, falls back to static data
+        """
+        # Check cache first
+        if fund_name in self._nav_cache:
+            return self._nav_cache[fund_name]
+        
+        # Try to get from MFApi
+        try:
+            from mf_api_service import mf_api_service
+            nav = mf_api_service.get_nav_by_fund_name(fund_name)
+            if nav:
+                self._nav_cache[fund_name] = nav
+                return nav
+        except Exception as e:
+            logging.warning(f"MFApi NAV fetch failed for {fund_name}: {e}")
+        
+        # Fallback to static data
         return self.fund_nav_data.get(fund_name, 100.00)
     
     def generate_performance_data(self, fund_name, period='1Y'):
