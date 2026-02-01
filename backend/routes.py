@@ -98,12 +98,22 @@ def generate_recommendations():
                 rec['holdings'] = holdings_data
             enriched_recommendations.append(rec)
         
-        return jsonify({
+        response_data = {
             'user_id': user.id,
             'recommendations': enriched_recommendations,
             'portfolio_summary': recommendations['portfolio_summary'],
             'investment_strategy': recommendations['investment_strategy']
-        }), 200
+        }
+        
+        # Include data_source if available
+        if 'data_source' in recommendations:
+            response_data['data_source'] = recommendations['data_source']
+        
+        # Include fund_count_info if available
+        if 'fund_count_info' in recommendations:
+            response_data['fund_count_info'] = recommendations['fund_count_info']
+        
+        return jsonify(response_data), 200
         
     except ValueError as ve:
         return jsonify({'error': str(ve)}), 400
