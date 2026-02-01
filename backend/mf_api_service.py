@@ -16,39 +16,44 @@ class MFApiService:
     BASE_URL = "https://api.mfapi.in"
     CACHE_DURATION = timedelta(hours=6)  # Cache data for 6 hours
     
-    # Sector-wise fund scheme codes (AMFI codes)
+    # Sector-wise fund scheme codes (AMFI codes) - All Direct Plan Growth options
     SECTOR_FUND_CODES = {
         'metal': [
-            '120716',  # Nippon India ETF Nifty Metal
-            '119551',  # SBI PSU Fund
+            '152769',  # ICICI Prudential Nifty Metal ETF
+            '149455',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Direct Plan Growth
+            '152924',  # Mirae Asset Nifty Metal ETF
         ],
         'defense': [
-            '153316',  # Motilal Oswal Nifty India Defence Index Fund
-            '119551',  # SBI PSU Fund
+            '152712',  # Motilal Oswal Nifty India Defence Index Fund Direct Plan Growth
+            '151750',  # HDFC Defence Fund - Growth Option - Direct Plan
+            '152798',  # Aditya Birla Sun Life Nifty India Defence Index Fund-Direct Growth
         ],
         'it': [
-            '120503',  # ICICI Prudential Technology Fund
-            '120716',  # Nippon India ETF Nifty IT
+            '152462',  # Kotak Technology Fund - Direct Plan - Growth Option
+            '152437',  # Edelweiss Technology Fund - Direct Plan - Growth
+            '120595',  # ICICI Prudential Technology Fund - Direct Plan - IDCW
         ],
         'pharma': [
-            '118989',  # Nippon India Pharma Fund
-            '119183',  # SBI Healthcare Opportunities Fund
+            '147409',  # Aditya Birla Sun Life Pharma and Healthcare Fund-Direct-Growth
+            '149268',  # ITI Pharma and Healthcare Fund - Direct Plan - Growth Option
+            '143874',  # ICICI Prudential Pharma Healthcare and Diagnostics (P.H.D) Fund - Direct Plan - Cumulative Option
         ],
         'banking': [
-            '120503',  # ICICI Prudential Banking and Financial Services Fund
-            '120716',  # Nippon India ETF Bank BeES
+            '103188',  # Aditya Birla Sun Life Banking & PSU Debt Fund - Growth - Regular Plan
+            '101296',  # Banking Index Benchmark Exchange Traded Scheme (Bank BeES)
         ],
         'auto': [
-            '119551',  # Tata Digital India Fund (includes auto)
+            '149455',  # ICICI Prudential Strategic Metal and Energy (includes auto sector exposure)
         ],
         'infrastructure': [
-            '120503',  # ICICI Prudential Infrastructure Fund
+            '149455',  # ICICI Prudential Strategic Metal and Energy (infrastructure exposure)
         ],
         'energy': [
-            '119551',  # SBI PSU Fund (energy heavy)
+            '149455',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Direct Plan Growth
+            '119028',  # DSP Natural Resources and New Energy Fund - Direct Plan - Growth
         ],
         'fmcg': [
-            '120716',  # Nippon India ETF Nifty FMCG
+            '149455',  # ICICI Prudential Strategic Metal and Energy (diversified exposure)
         ]
     }
     
