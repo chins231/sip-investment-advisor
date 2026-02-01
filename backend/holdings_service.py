@@ -167,6 +167,14 @@ class FundHoldingsService:
             if 'index' in fund_name or 'nifty' in fund_name or 'sensex' in fund_name:
                 return self._get_index_holdings(fund_name)
             
+            # Strategy 5: For multi-cap/flexi-cap/large-cap/mid-cap funds
+            if any(keyword in fund_name for keyword in ['multi cap', 'flexi cap', 'large cap', 'mid cap', 'small cap', 'bluechip', 'emerging', 'focused']):
+                return self._get_diversified_holdings(fund_name, fund_type)
+            
+            # Strategy 6: Check if it's an equity fund (last resort)
+            if 'equity' in fund_type.lower():
+                return self._get_diversified_holdings(fund_name, fund_type)
+            
             # No holdings data available
             return None
             
@@ -226,6 +234,81 @@ class FundHoldingsService:
             'data_source': 'index_composition',
             'last_updated': 'Approximate Nifty 50 weights',
             'note': 'Top 10 holdings from Nifty 50 index (approximate weights)'
+        }
+    
+    def _get_diversified_holdings(self, fund_name: str, fund_type: str) -> Dict:
+        """Get holdings for diversified/multi-cap/flexi-cap funds"""
+        
+        # Determine fund category for appropriate holdings
+        if 'large cap' in fund_name.lower() or 'bluechip' in fund_name.lower():
+            # Large cap focused - show top large caps
+            holdings = [
+                {'name': 'Reliance Industries', 'percentage': 8.5, 'sector': 'Oil & Gas'},
+                {'name': 'HDFC Bank', 'percentage': 7.8, 'sector': 'Banking'},
+                {'name': 'ICICI Bank', 'percentage': 6.5, 'sector': 'Banking'},
+                {'name': 'Infosys', 'percentage': 5.9, 'sector': 'IT Services'},
+                {'name': 'TCS', 'percentage': 5.2, 'sector': 'IT Services'},
+                {'name': 'Hindustan Unilever', 'percentage': 4.8, 'sector': 'FMCG'},
+                {'name': 'ITC', 'percentage': 4.2, 'sector': 'FMCG'},
+                {'name': 'State Bank of India', 'percentage': 3.9, 'sector': 'Banking'},
+                {'name': 'Bharti Airtel', 'percentage': 3.5, 'sector': 'Telecom'},
+                {'name': 'Kotak Mahindra Bank', 'percentage': 3.2, 'sector': 'Banking'}
+            ]
+            note = 'Representative large-cap holdings for bluechip/large-cap funds'
+        
+        elif 'mid cap' in fund_name.lower() or 'midcap' in fund_name.lower():
+            # Mid cap focused
+            holdings = [
+                {'name': 'Trent', 'percentage': 5.8, 'sector': 'Retail'},
+                {'name': 'Persistent Systems', 'percentage': 5.2, 'sector': 'IT Services'},
+                {'name': 'Coforge', 'percentage': 4.8, 'sector': 'IT Services'},
+                {'name': 'Tube Investments', 'percentage': 4.5, 'sector': 'Auto Components'},
+                {'name': 'Polycab India', 'percentage': 4.2, 'sector': 'Cables'},
+                {'name': 'Cummins India', 'percentage': 3.9, 'sector': 'Industrial'},
+                {'name': 'Voltas', 'percentage': 3.6, 'sector': 'Consumer Durables'},
+                {'name': 'Crompton Greaves', 'percentage': 3.3, 'sector': 'Consumer Durables'},
+                {'name': 'Astral', 'percentage': 3.0, 'sector': 'Building Materials'},
+                {'name': 'Dixon Technologies', 'percentage': 2.8, 'sector': 'Electronics'}
+            ]
+            note = 'Representative mid-cap holdings for mid-cap focused funds'
+        
+        elif 'small cap' in fund_name.lower() or 'smallcap' in fund_name.lower():
+            # Small cap focused
+            holdings = [
+                {'name': 'Kalyan Jewellers', 'percentage': 4.2, 'sector': 'Retail'},
+                {'name': 'Apar Industries', 'percentage': 3.8, 'sector': 'Cables'},
+                {'name': 'Happiest Minds', 'percentage': 3.5, 'sector': 'IT Services'},
+                {'name': 'Lemon Tree Hotels', 'percentage': 3.2, 'sector': 'Hospitality'},
+                {'name': 'KPIT Technologies', 'percentage': 3.0, 'sector': 'IT Services'},
+                {'name': 'Carborundum Universal', 'percentage': 2.8, 'sector': 'Industrial'},
+                {'name': 'Aarti Industries', 'percentage': 2.6, 'sector': 'Chemicals'},
+                {'name': 'Sona BLW Precision', 'percentage': 2.4, 'sector': 'Auto Components'},
+                {'name': 'Amber Enterprises', 'percentage': 2.2, 'sector': 'Consumer Durables'},
+                {'name': 'Bikaji Foods', 'percentage': 2.0, 'sector': 'FMCG'}
+            ]
+            note = 'Representative small-cap holdings for small-cap focused funds'
+        
+        else:
+            # Multi-cap/Flexi-cap/Emerging Bluechip - diversified across market caps
+            holdings = [
+                {'name': 'Reliance Industries', 'percentage': 6.5, 'sector': 'Oil & Gas'},
+                {'name': 'HDFC Bank', 'percentage': 5.8, 'sector': 'Banking'},
+                {'name': 'Infosys', 'percentage': 5.2, 'sector': 'IT Services'},
+                {'name': 'ICICI Bank', 'percentage': 4.9, 'sector': 'Banking'},
+                {'name': 'Trent', 'percentage': 4.5, 'sector': 'Retail'},
+                {'name': 'Persistent Systems', 'percentage': 4.2, 'sector': 'IT Services'},
+                {'name': 'Bharti Airtel', 'percentage': 3.8, 'sector': 'Telecom'},
+                {'name': 'Titan Company', 'percentage': 3.5, 'sector': 'Consumer Durables'},
+                {'name': 'Asian Paints', 'percentage': 3.2, 'sector': 'Paints'},
+                {'name': 'Bajaj Finance', 'percentage': 3.0, 'sector': 'NBFC'}
+            ]
+            note = 'Representative diversified holdings across large, mid, and emerging companies'
+        
+        return {
+            'holdings': holdings,
+            'data_source': 'category_inference',
+            'last_updated': 'Typical allocation for this fund category',
+            'note': note
         }
 
 # Global instance
