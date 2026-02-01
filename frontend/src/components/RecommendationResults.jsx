@@ -169,23 +169,47 @@ const RecommendationResults = ({ data }) => {
                   <label>Monthly SIP</label>
                   <value>{formatCurrency(rec.monthly_investment)}</value>
                 </div>
+                {rec.nav ? (
+                  <div className="detail-item">
+                    <label>Current NAV</label>
+                    <value>₹{rec.nav}</value>
+                  </div>
+                ) : (
+                  <div className="detail-item" style={{ gridColumn: '1 / -1' }}>
+                    <div style={{
+                      padding: '0.75rem',
+                      background: '#fef3c7',
+                      borderRadius: '6px',
+                      border: '1px solid #f59e0b',
+                      fontSize: '0.9rem'
+                    }}>
+                      <strong style={{ color: '#92400e' }}>ℹ️ NAV Unavailable</strong>
+                      <p style={{ margin: '0.5rem 0 0 0', color: '#78350f' }}>
+                        Real-time NAV data is currently unavailable. Please visit the fund's official website for the latest NAV and performance data.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '1rem', flexWrap: 'wrap' }}>
-                <button
-                  onClick={() => setSelectedFund(selectedFund === rec.fund_name ? null : rec.fund_name)}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    background: selectedFund === rec.fund_name ? '#ef4444' : '#2563eb',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    transition: 'all 0.3s'
-                  }}
-                >
-                  {selectedFund === rec.fund_name ? '✕ Hide Performance' : '📊 View Performance'}
-                </button>
+                {/* Only show performance button if NAV data is available */}
+                {rec.nav && (
+                  <button
+                    onClick={() => setSelectedFund(selectedFund === rec.fund_name ? null : rec.fund_name)}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: selectedFund === rec.fund_name ? '#ef4444' : '#2563eb',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      transition: 'all 0.3s'
+                    }}
+                  >
+                    {selectedFund === rec.fund_name ? '✕ Hide Performance' : '📊 View Performance'}
+                  </button>
+                )}
                 
                 <button
                   onClick={() => setSelectedHoldings(selectedHoldings === rec.fund_name ? null : rec.fund_name)}
@@ -202,6 +226,29 @@ const RecommendationResults = ({ data }) => {
                 >
                   {selectedHoldings === rec.fund_name ? '✕ Hide Holdings' : '🏢 View Holdings'}
                 </button>
+                
+                {/* Show fund website link when NAV is unavailable */}
+                {!rec.nav && rec.holdings_url && (
+                  <a
+                    href={rec.holdings_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: '#f59e0b',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      display: 'inline-block',
+                      transition: 'all 0.3s'
+                    }}
+                  >
+                    🔗 Visit Fund Website
+                  </a>
+                )}
               </div>
               
               {selectedFund === rec.fund_name && (
