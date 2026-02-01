@@ -209,7 +209,7 @@ const RecommendationResults = ({ data }) => {
               )}
               
               {selectedHoldings === rec.fund_name && (
-                <FundHoldings fundName={rec.fund_name} />
+                <FundHoldings holdingsData={rec.holdings} />
               )}
             </div>
           ))}

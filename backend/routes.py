@@ -3,6 +3,7 @@ from sip_engine import SIPRecommendationEngine
 from models import db, User, SIPRecommendation
 from fund_data import FundDataService
 from sector_funds import get_sectors_list, get_sector_funds, SECTOR_FUNDS
+from holdings_service import holdings_service
 
 api = Blueprint('api', __name__)
 engine = SIPRecommendationEngine()
@@ -88,9 +89,18 @@ def generate_recommendations():
         
         db.session.commit()
         
+        # Enrich recommendations with holdings data
+        enriched_recommendations = []
+        for rec in recommendations['recommendations']:
+            # Get holdings for this fund
+            holdings_data = holdings_service.get_holdings(rec)
+            if holdings_data:
+                rec['holdings'] = holdings_data
+            enriched_recommendations.append(rec)
+        
         return jsonify({
             'user_id': user.id,
-            'recommendations': recommendations['recommendations'],
+            'recommendations': enriched_recommendations,
             'portfolio_summary': recommendations['portfolio_summary'],
             'investment_strategy': recommendations['investment_strategy']
         }), 200
