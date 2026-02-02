@@ -22,10 +22,21 @@ class MFApiService:
             '119016',  # HDFC Short Term Debt Fund - Growth Option - Direct Plan
             '111972',  # ICICI Prudential Corporate Bond Fund Retail Growth
             '120438',  # Axis Banking & PSU Debt Fund - Direct Plan - Growth Option
+            '118987',  # HDFC Corporate Bond Fund - Growth Option - Direct Plan
         ],
         'hybrid': [
             '119118',  # HDFC Hybrid Debt Fund - Growth Option - Direct Plan
             '120252',  # ICICI Prudential Equity & Debt Fund - Direct Plan - Monthly IDCW
+            '118968',  # HDFC Balanced Advantage Fund - Growth Plan - Direct Plan
+            '131451',  # ICICI Prudential Balanced Advantage Fund - Direct Plan - Quarterly IDCW
+        ],
+        'equity': [
+            '118825',  # Mirae Asset Large Cap Fund - Direct Plan - Growth
+            '122639',  # Parag Parikh Flexi Cap Fund - Direct Plan - Growth
+            '149937',  # Axis Nifty Midcap 50 Index Fund - Regular Plan - IDCW Option
+            '120164',  # Kotak-Small Cap Fund - Growth - Direct
+            '149288',  # HDFC NIFTY Next 50 Index Fund - Direct Plan - Growth Option
+            '150313',  # UTI Nifty Midcap 150 Quality 50 Index Fund - Direct Plan - Growth Option
         ],
     }
     
