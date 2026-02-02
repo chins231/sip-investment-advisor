@@ -40,6 +40,11 @@ def generate_recommendations():
         if fund_selection_mode not in ['curated', 'comprehensive']:
             return jsonify({'error': 'fund_selection_mode must be curated or comprehensive'}), 400
         
+        # Get index_funds_only flag (default to False)
+        index_funds_only = data.get('index_funds_only', False)
+        if not isinstance(index_funds_only, bool):
+            index_funds_only = str(index_funds_only).lower() == 'true'
+        
         # Get sector preferences if provided
         sector_preferences = data.get('sector_preferences', None)
         if sector_preferences and len(sector_preferences) > 0:
@@ -49,6 +54,10 @@ def generate_recommendations():
                 if sector not in valid_sectors:
                     return jsonify({'error': f'Invalid sector: {sector}'}), 400
         
+        # Validate: Cannot use both sector preferences and index funds only
+        if sector_preferences and len(sector_preferences) > 0 and index_funds_only:
+            return jsonify({'error': 'Cannot use both sector preferences and index funds only filter'}), 400
+        
         # Generate recommendations
         recommendations = engine.generate_recommendations(
             risk_profile=risk_profile_key,
@@ -56,7 +65,8 @@ def generate_recommendations():
             monthly_investment=float(data['monthly_investment']),
             max_funds=max_funds,
             sector_preferences=sector_preferences,
-            fund_selection_mode=fund_selection_mode
+            fund_selection_mode=fund_selection_mode,
+            index_funds_only=index_funds_only
         )
         
         # Check if user exists, create or update

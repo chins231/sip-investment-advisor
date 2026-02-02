@@ -11,6 +11,7 @@ const InvestmentForm = ({ onSubmit, loading }) => {
     max_funds: 5,
     sector_preferences: [],
     fund_selection_mode: 'curated', // 'curated' or 'comprehensive'
+    index_funds_only: false, // Index funds only filter
   });
 
   const [errors, setErrors] = useState({});
@@ -297,18 +298,84 @@ const InvestmentForm = ({ onSubmit, loading }) => {
 
       <div className="form-group">
         <label>
+          Investment Strategy <span style={{fontSize: '0.7rem', color: '#f59e0b'}}>NEW</span>
+        </label>
+        <div className="index-funds-toggle" style={{
+          padding: '15px',
+          backgroundColor: formData.index_funds_only ? '#fef3c7' : '#f3f4f6',
+          border: `2px solid ${formData.index_funds_only ? '#f59e0b' : '#d1d5db'}`,
+          borderRadius: '8px',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease'
+        }}
+        onClick={() => !loading && setFormData(prev => ({
+          ...prev,
+          index_funds_only: !prev.index_funds_only,
+          sector_preferences: prev.index_funds_only ? prev.sector_preferences : [] // Clear sectors when enabling index funds
+        }))}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '4px',
+              border: '2px solid #f59e0b',
+              backgroundColor: formData.index_funds_only ? '#f59e0b' : 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '16px'
+            }}>
+              {formData.index_funds_only ? '✓' : ''}
+            </div>
+            <div style={{ flex: 1 }}>
+              <strong style={{ fontSize: '1.05rem', color: formData.index_funds_only ? '#92400e' : '#374151' }}>
+                📊 Index Funds Only (Passive Investing)
+              </strong>
+              <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', color: '#6b7280' }}>
+                Low-cost passive funds that track market indices like Nifty 50, Nifty Midcap, etc.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        {formData.index_funds_only && (
+          <div className="info-box" style={{
+            marginTop: '10px',
+            padding: '12px',
+            backgroundColor: '#fffbeb',
+            borderLeft: '3px solid #f59e0b',
+            borderRadius: '4px'
+          }}>
+            <strong>💡 Index Funds Benefits:</strong>
+            <ul style={{ marginTop: '8px', marginBottom: '0', paddingLeft: '20px', fontSize: '0.9rem' }}>
+              <li>Lower expense ratios (0.1-0.5% vs 1-2% for active funds)</li>
+              <li>Transparent holdings (tracks index composition)</li>
+              <li>Consistent with market returns (no fund manager risk)</li>
+              <li>Ideal for long-term passive investing strategy</li>
+            </ul>
+          </div>
+        )}
+      </div>
+
+      <div className="form-group">
+        <label>
           Sector Preferences (Optional) <span style={{fontSize: '0.7rem', color: '#10b981'}}>v2.1</span>
           <button
             type="button"
             className="btn-link"
-            onClick={() => setShowSectorSelection(!showSectorSelection)}
-            style={{ marginLeft: '10px', fontSize: '0.9rem' }}
+            onClick={() => !formData.index_funds_only && setShowSectorSelection(!showSectorSelection)}
+            style={{ marginLeft: '10px', fontSize: '0.9rem', opacity: formData.index_funds_only ? 0.5 : 1 }}
+            disabled={formData.index_funds_only}
           >
             {showSectorSelection ? '▼ Hide Sectors' : '▶ Show Sectors'}
           </button>
         </label>
         <small style={{ display: 'block', marginBottom: '10px' }}>
-          Select specific sectors for targeted investments. Leave empty for diversified portfolio.
+          {formData.index_funds_only
+            ? '⚠️ Sector selection is disabled when "Index Funds Only" is enabled.'
+            : 'Select specific sectors for targeted investments. Leave empty for diversified portfolio.'}
         </small>
         
         {showSectorSelection && (

@@ -80,7 +80,47 @@ const FAQSection = () => {
       ]
     },
     {
-      category: '💰 Returns & Taxation',
+      category: '📊 Index Funds & Passive Investing',
+      questions: [
+        {
+          q: 'What are Index Funds?',
+          a: 'Index funds are passive mutual funds that track a market index like Nifty 50, Nifty Midcap 150, or Sensex. Instead of a fund manager actively picking stocks, the fund simply mirrors the index composition.\n\nExample: A Nifty 50 index fund will hold the same 50 stocks in the same proportion as the Nifty 50 index.',
+          video: 'https://www.youtube.com/watch?v=fvGLnthJDsg'
+        },
+        {
+          q: 'Index Funds vs Active Funds - Which is better?',
+          a: 'Index Funds Advantages:\n✓ Lower expense ratio (0.1-0.5% vs 1-2%)\n✓ Transparent holdings (you know exactly what you own)\n✓ No fund manager risk\n✓ Consistent with market returns\n✓ Better for long-term passive investing\n\nActive Funds Advantages:\n✓ Potential to beat the market\n✓ Fund manager expertise\n✓ Can avoid bad stocks\n\nFor most investors, index funds are better due to lower costs and simplicity.',
+          video: 'https://www.youtube.com/watch?v=fvGLnthJDsg'
+        },
+        {
+          q: 'What are the advantages of Index Funds?',
+          a: '1. Low Cost: Expense ratios as low as 0.1-0.5% (vs 1-2% for active funds)\n2. Transparency: You always know what stocks you own\n3. Diversification: Instant exposure to 50-250 companies\n4. No Fund Manager Risk: Performance doesn\'t depend on one person\n5. Tax Efficient: Lower portfolio turnover means less capital gains tax\n6. Simplicity: Easy to understand and track\n7. Long-term Performance: Over 10+ years, most active funds fail to beat index',
+          video: 'https://www.youtube.com/watch?v=fvGLnthJDsg'
+        },
+        {
+          q: 'What are the disadvantages of Index Funds?',
+          a: '1. No Outperformance: Can never beat the market, only match it\n2. Tracking Error: Small difference between fund and index returns\n3. No Downside Protection: Falls with the market during crashes\n4. Limited to Index: Can\'t avoid bad companies in the index\n5. Not Suitable for Short-term: Best for 5+ years investment\n\nDespite these, index funds are excellent for long-term wealth creation.',
+          video: null
+        },
+        {
+          q: 'Which Index Funds should I invest in?',
+          a: 'Popular Index Funds in India:\n\n1. Nifty 50 Index Funds (Large Cap):\n- HDFC Index Fund - Nifty 50\n- ICICI Prudential Nifty Index Fund\n- UTI Nifty Index Fund\n\n2. Nifty Next 50 (Large Cap):\n- HDFC Nifty Next 50 Index Fund\n\n3. Nifty Midcap 150 (Mid Cap):\n- HDFC Nifty Midcap 150 Index Fund\n- ICICI Prudential Nifty Midcap 150\n\n4. Nifty Smallcap 250 (Small Cap):\n- HDFC Nifty Smallcap 250 Index Fund\n\nStart with Nifty 50 for stability, add Midcap for growth.',
+          video: null
+        },
+        {
+          q: 'How much should I allocate to Index Funds?',
+          a: 'Recommended Allocation:\n\nConservative (Low Risk):\n- 70% Debt funds\n- 20% Nifty 50 Index\n- 10% Nifty Midcap Index\n\nBalanced (Medium Risk):\n- 30% Debt funds\n- 40% Nifty 50 Index\n- 30% Nifty Midcap Index\n\nAggressive (High Risk):\n- 10% Debt funds\n- 30% Nifty 50 Index\n- 30% Nifty Midcap Index\n- 30% Nifty Smallcap Index\n\nYou can also mix index funds with active funds (50-50 split).',
+          video: null
+        },
+        {
+          q: 'Are Index Funds good for SIP?',
+          a: 'Yes! Index funds are excellent for SIP:\n✓ Rupee cost averaging works perfectly\n✓ Lower costs compound over time\n✓ No need to time the market\n✓ Disciplined long-term investing\n✓ Reduces emotional decision-making\n\nSIP in index funds is one of the simplest and most effective wealth creation strategies for 10+ years.',
+          video: 'https://www.youtube.com/watch?v=fvGLnthJDsg'
+        }
+      ]
+    },
+    {
+      category: '� Returns & Taxation',
       questions: [
         {
           q: 'What returns can I expect from SIP?',

@@ -180,12 +180,13 @@ class SIPRecommendationEngine:
             }
         }
     
-    def generate_recommendations(self, risk_profile, investment_years, monthly_investment, max_funds=None, sector_preferences=None, fund_selection_mode='curated'):
+    def generate_recommendations(self, risk_profile, investment_years, monthly_investment, max_funds=None, sector_preferences=None, fund_selection_mode='curated', index_funds_only=False):
         """
         Generate complete SIP recommendations
         If sector_preferences is provided, include sector-specific funds
         
         fund_selection_mode: 'curated' (static handpicked funds) or 'comprehensive' (API-fetched all funds)
+        index_funds_only: If True, only show index funds (passive investing)
         """
         # Validate inputs
         if risk_profile not in ['low_risk', 'medium_risk', 'high_risk']:
@@ -245,6 +246,67 @@ class SIPRecommendationEngine:
                         rec['scheme_code'] = fund.get('scheme_code')
                         rec['fund_house'] = fund.get('fund_house')
                     recommendations.append(rec)
+        elif index_funds_only:
+            # Index funds only - passive investing strategy
+            if max_funds:
+                try:
+                    from mf_api_service import mf_api_service
+                    
+                    # Fetch index funds with ranking based on mode
+                    use_ranking = (fund_selection_mode == 'curated')
+                    api_funds, is_api_data = mf_api_service.get_index_funds(risk_profile, max_funds, use_ranking)
+                    
+                    if is_api_data and api_funds:
+                        # Successfully fetched index funds from API
+                        allocation_per_fund = 100 / len(api_funds)
+                        for fund in api_funds:
+                            raw_monthly_investment = monthly_investment * (allocation_per_fund / 100)
+                            rec = {
+                                'fund_name': fund['name'],
+                                'fund_type': fund['type'],
+                                'allocation_percentage': allocation_per_fund,
+                                'monthly_investment': self.round_sip_amount(raw_monthly_investment),
+                                'expected_return': fund['expected_return'],
+                                'risk_level': fund['risk_level'],
+                                'has_holdings': False,
+                                'nav': fund.get('nav'),
+                                'nav_date': fund.get('nav_date'),
+                                'scheme_code': fund.get('scheme_code'),
+                                'fund_house': fund.get('fund_house'),
+                                'cagr_3y': fund.get('cagr_3y'),
+                                'is_dynamic': True,
+                                'is_index_fund': True
+                            }
+                            recommendations.append(rec)
+                        
+                        data_source_info = {
+                            'source': 'api',
+                            'api_name': 'MFApi',
+                            'fund_count': len(api_funds),
+                            'has_live_nav': True,
+                            'mode': fund_selection_mode,
+                            'ranking': '3-year CAGR' if use_ranking else 'None',
+                            'fund_type': 'Index Funds Only'
+                        }
+                    else:
+                        # API failed for index funds
+                        data_source_info = {
+                            'source': 'static',
+                            'reason': 'api_unavailable',
+                            'mode': f'{fund_selection_mode}_fallback',
+                            'message': 'MFApi is currently unavailable for index funds. Please try again later.',
+                            'fund_type': 'Index Funds Only'
+                        }
+                except Exception as e:
+                    import logging
+                    logging.error(f"Error fetching index funds from API: {e}")
+                    data_source_info = {
+                        'source': 'static',
+                        'reason': 'api_error',
+                        'mode': f'{fund_selection_mode}_fallback',
+                        'message': f'Error fetching index funds: {str(e)}. Please try again later.',
+                        'fund_type': 'Index Funds Only'
+                    }
         else:
             # Diversified portfolio (no sectors selected)
             # Try to fetch from MFApi based on mode
