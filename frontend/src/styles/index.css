@@ -229,6 +229,54 @@ body {
 .risk-medium { border-left: 4px solid var(--warning-color); }
 .risk-high { border-left: 4px solid var(--danger-color); }
 
+/* Fund Mode Selector */
+.fund-mode-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.fund-mode-option {
+  padding: 1.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  background: white;
+}
+
+.fund-mode-option:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.fund-mode-option.selected {
+  border-color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.fund-mode-option h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.fund-mode-option p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.fund-mode-option small {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+
 .results-section {
   margin-top: 3rem;
 }

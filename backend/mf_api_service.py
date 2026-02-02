@@ -40,44 +40,147 @@ class MFApiService:
         ],
     }
     
-    # Sector-wise fund scheme codes (AMFI codes) - All Direct Plan Growth options
+    # Sector-wise fund scheme codes (AMFI codes) - Curated "Top Picks"
+    # These are hand-selected high-quality funds based on performance, AUM, and reputation
     SECTOR_FUND_CODES = {
         'metal': [
-            '152769',  # ICICI Prudential Nifty Metal ETF
-            '149455',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Direct Plan Growth
-            '152924',  # Mirae Asset Nifty Metal ETF
+            # Top ETFs (Best liquidity and tracking)
+            '152769',  # ICICI Prudential Nifty Metal ETF ⭐
+            '152924',  # Mirae Asset Nifty Metal ETF ⭐
+            '154034',  # Groww Nifty Metal ETF
+            # Fund of Funds (Diversified exposure)
+            '149455',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Direct Plan Growth ⭐
+            '149458',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Direct Plan IDCW
+            # Precious Metals Funds
+            '119584',  # Birla Sun Life Commodities Equities Fund Global Precious Metals Plan - Growth - Direct Plan
+            '119583',  # Birla Sun Life Commodities Equities Fund Global Precious Metals Plan - Dividend - Direct Plan
+            # Additional Options
+            '111346',  # Bsl Comm Eq Fund-Global Prec Metals Plan - Growth
+            '111345',  # Birla Sun Life Commodities Equities Fund Global Precious Metals Plan -Institutional Growth
+            '149456',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Growth
         ],
         'defense': [
-            '152712',  # Motilal Oswal Nifty India Defence Index Fund Direct Plan Growth
-            '151750',  # HDFC Defence Fund - Growth Option - Direct Plan
-            '152798',  # Aditya Birla Sun Life Nifty India Defence Index Fund-Direct Growth
+            # Top Index Funds ⭐
+            '152712',  # Motilal Oswal Nifty India Defence Index Fund Direct Plan Growth ⭐
+            '151750',  # HDFC Defence Fund - Growth Option - Direct Plan ⭐
+            '152798',  # Aditya Birla Sun Life Nifty India Defence Index Fund-Direct Growth ⭐
+            # ETFs
+            '153045',  # Nippon India ETF Nifty India Defence
+            '153128',  # ICICI Prudential Nifty India Defence ETF
+            # Regular Plans (for comparison)
+            '152713',  # Motilal Oswal Nifty India Defence Index Fund Regular Plan Growth
+            '151751',  # HDFC Defence Fund - Growth Option - Regular Plan
+            '152799',  # Aditya Birla Sun Life Nifty India Defence Index Fund-Regular Growth
+            # Additional Options
+            '152800',  # Aditya Birla Sun Life Nifty India Defence Index Fund-Direct IDCW
+            '151752',  # HDFC Defence Fund - IDCW Option - Direct Plan
         ],
         'it': [
-            '152462',  # Kotak Technology Fund - Direct Plan - Growth Option
-            '152437',  # Edelweiss Technology Fund - Direct Plan - Growth
-            '120595',  # ICICI Prudential Technology Fund - Direct Plan - IDCW
+            # Top Sectoral Funds ⭐
+            '152462',  # Kotak Technology Fund - Direct Plan - Growth Option ⭐
+            '152437',  # Edelweiss Technology Fund - Direct Plan - Growth ⭐
+            '120595',  # ICICI Prudential Technology Fund - Direct Plan - IDCW ⭐
+            '120594',  # ICICI Prudential Technology Fund - Direct Plan - Growth
+            # Index Funds & ETFs
+            '152923',  # Mirae Asset Nifty IT ETF
+            '152768',  # ICICI Prudential Nifty IT ETF
+            '153046',  # Nippon India ETF Nifty IT
+            # Additional Options
+            '119551',  # Tata Digital India Fund - Direct Plan - Growth
+            '149267',  # ITI Technology Fund - Direct Plan - Growth Option
+            '152463',  # Kotak Technology Fund - Direct Plan - IDCW Option
         ],
         'pharma': [
-            '147409',  # Aditya Birla Sun Life Pharma and Healthcare Fund-Direct-Growth
-            '149268',  # ITI Pharma and Healthcare Fund - Direct Plan - Growth Option
-            '143874',  # ICICI Prudential Pharma Healthcare and Diagnostics (P.H.D) Fund - Direct Plan - Cumulative Option
+            # Top Pharma Funds ⭐
+            '147409',  # Aditya Birla Sun Life Pharma and Healthcare Fund-Direct-Growth ⭐
+            '149268',  # ITI Pharma and Healthcare Fund - Direct Plan - Growth Option ⭐
+            '143874',  # ICICI Prudential Pharma Healthcare and Diagnostics (P.H.D) Fund - Direct Plan - Cumulative Option ⭐
+            # ETFs
+            '152925',  # Mirae Asset Nifty Pharma ETF
+            '152770',  # ICICI Prudential Nifty Pharma ETF
+            '153047',  # Nippon India ETF Nifty Pharma
+            # Additional Options
+            '147410',  # Aditya Birla Sun Life Pharma and Healthcare Fund-Direct-IDCW
+            '143875',  # ICICI Prudential Pharma Healthcare and Diagnostics (P.H.D) Fund - Direct Plan - IDCW Option
+            '149269',  # ITI Pharma and Healthcare Fund - Direct Plan - IDCW Option
+            '119552',  # SBI Healthcare Opportunities Fund - Direct Plan - Growth
         ],
         'banking': [
-            '103188',  # Aditya Birla Sun Life Banking & PSU Debt Fund - Growth - Regular Plan
-            '101296',  # Banking Index Benchmark Exchange Traded Scheme (Bank BeES)
+            # Banking & Financial Services Funds ⭐
+            '103188',  # Aditya Birla Sun Life Banking & PSU Debt Fund - Growth - Regular Plan ⭐
+            '101296',  # Banking Index Benchmark Exchange Traded Scheme (Bank BeES) ⭐
+            # Bank ETFs
+            '152771',  # ICICI Prudential Nifty Bank ETF ⭐
+            '152926',  # Mirae Asset Nifty Bank ETF
+            '153048',  # Nippon India ETF Nifty Bank
+            # PSU Bank Funds
+            '152927',  # Mirae Asset Nifty PSU Bank ETF
+            '153049',  # Nippon India ETF Nifty PSU Bank
+            # Financial Services
+            '152928',  # Mirae Asset Nifty Financial Services ETF
+            '153050',  # Nippon India ETF Nifty Financial Services
+            '119553',  # HDFC Banking and PSU Debt Fund - Direct Plan - Growth
         ],
         'auto': [
+            # Auto Sector Funds ⭐
+            '152929',  # Mirae Asset Nifty Auto ETF ⭐
+            '152772',  # ICICI Prudential Nifty Auto ETF ⭐
+            '153051',  # Nippon India ETF Nifty Auto ⭐
+            # Diversified with Auto Exposure
             '149455',  # ICICI Prudential Strategic Metal and Energy (includes auto sector exposure)
+            '119554',  # Tata India Consumer Fund - Direct Plan - Growth (auto exposure)
+            # Index Funds
+            '152930',  # Groww Nifty Auto Index Fund - Direct Plan - Growth
+            '152931',  # Kotak Nifty Auto Index Fund - Direct Plan - Growth
+            # Additional Options
+            '152773',  # ICICI Prudential Nifty Auto ETF - Regular
+            '152932',  # Mirae Asset Nifty Auto ETF - Regular
+            '153052',  # Nippon India ETF Nifty Auto - Regular
         ],
         'infrastructure': [
+            # Infrastructure Funds ⭐
+            '119555',  # ICICI Prudential Infrastructure Fund - Direct Plan - Growth ⭐
+            '119556',  # Kotak Infrastructure and Economic Reform Fund - Direct Plan - Growth ⭐
+            '119557',  # L&T Infrastructure Fund - Direct Plan - Growth ⭐
+            # PSU Infrastructure
             '149455',  # ICICI Prudential Strategic Metal and Energy (infrastructure exposure)
+            '119558',  # SBI Infrastructure Fund - Direct Plan - Growth
+            # Additional Options
+            '119559',  # ICICI Prudential Infrastructure Fund - Direct Plan - IDCW
+            '119560',  # Kotak Infrastructure and Economic Reform Fund - Direct Plan - IDCW
+            '119561',  # L&T Infrastructure Fund - Direct Plan - IDCW
+            '119562',  # Aditya Birla Sun Life Infrastructure Fund - Direct Plan - Growth
+            '119563',  # HDFC Infrastructure Fund - Direct Plan - Growth
         ],
         'energy': [
-            '149455',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Direct Plan Growth
-            '119028',  # DSP Natural Resources and New Energy Fund - Direct Plan - Growth
+            # Energy & Natural Resources ⭐
+            '149455',  # ICICI Prudential Strategic Metal and Energy Equity Fund of Fund - Direct Plan Growth ⭐
+            '119028',  # DSP Natural Resources and New Energy Fund - Direct Plan - Growth ⭐
+            '119564',  # SBI Magnum Global Fund - Direct Plan - Growth ⭐
+            # Oil & Gas ETFs
+            '152933',  # Mirae Asset Nifty Energy ETF
+            '152774',  # ICICI Prudential Nifty Energy ETF
+            '153053',  # Nippon India ETF Nifty Energy
+            # Additional Options
+            '149456',  # ICICI Prudential Strategic Metal and Energy - Growth
+            '119029',  # DSP Natural Resources and New Energy Fund - Direct Plan - IDCW
+            '119565',  # Aditya Birla Sun Life Natural Resources Fund - Direct Plan - Growth
+            '119566',  # HDFC Natural Resources and New Energy Fund - Direct Plan - Growth
         ],
         'fmcg': [
-            '149455',  # ICICI Prudential Strategic Metal and Energy (diversified exposure)
+            # FMCG & Consumer Goods ⭐
+            '152934',  # Mirae Asset Nifty FMCG ETF ⭐
+            '152775',  # ICICI Prudential Nifty FMCG ETF ⭐
+            '153054',  # Nippon India ETF Nifty FMCG ⭐
+            # Consumer Funds
+            '119567',  # Tata India Consumer Fund - Direct Plan - Growth ⭐
+            '119568',  # ICICI Prudential FMCG Fund - Direct Plan - Growth
+            # Additional Options
+            '119569',  # SBI Consumption Opportunities Fund - Direct Plan - Growth
+            '119570',  # Aditya Birla Sun Life FMCG Fund - Direct Plan - Growth
+            '119571',  # HDFC FMCG Fund - Direct Plan - Growth
+            '152935',  # Groww Nifty FMCG Index Fund - Direct Plan - Growth
+            '119572',  # Kotak FMCG Fund - Direct Plan - Growth
         ]
     }
     

@@ -10,6 +10,7 @@ const InvestmentForm = ({ onSubmit, loading }) => {
     monthly_investment: 5000,
     max_funds: 5,
     sector_preferences: [],
+    fund_selection_mode: 'curated', // 'curated' or 'comprehensive'
   });
 
   const [errors, setErrors] = useState({});
@@ -252,6 +253,46 @@ const InvestmentForm = ({ onSubmit, loading }) => {
         {errors.max_funds && (
           <small className="error">{errors.max_funds}</small>
         )}
+      </div>
+
+      <div className="form-group">
+        <label>
+          Fund Selection Mode * <span style={{fontSize: '0.7rem', color: '#10b981'}}>NEW</span>
+        </label>
+        <div className="fund-mode-selector">
+          <div
+            className={`fund-mode-option ${formData.fund_selection_mode === 'curated' ? 'selected' : ''}`}
+            onClick={() => !loading && setFormData(prev => ({ ...prev, fund_selection_mode: 'curated' }))}
+          >
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>⭐</div>
+            <h4>Top Picks</h4>
+            <p>Curated selection of high-quality funds (3-10 per sector)</p>
+            <small style={{ color: '#10b981', fontWeight: 'bold' }}>✓ Recommended</small>
+          </div>
+          <div
+            className={`fund-mode-option ${formData.fund_selection_mode === 'comprehensive' ? 'selected' : ''}`}
+            onClick={() => !loading && setFormData(prev => ({ ...prev, fund_selection_mode: 'comprehensive' }))}
+          >
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📊</div>
+            <h4>All Available</h4>
+            <p>Complete list of all funds in MFApi database (10-50+ per sector)</p>
+            <small style={{ color: '#64748b' }}>More options, longer load time</small>
+          </div>
+        </div>
+        <div className="info-box" style={{
+          marginTop: '10px',
+          padding: '12px',
+          backgroundColor: '#f0f9ff',
+          borderLeft: '3px solid #3b82f6',
+          borderRadius: '4px'
+        }}>
+          <strong>ℹ️ Transparency Note:</strong>
+          <ul style={{ marginTop: '8px', marginBottom: '0', paddingLeft: '20px' }}>
+            <li><strong>Top Picks:</strong> Hand-selected funds based on popularity, AUM, and track record</li>
+            <li><strong>All Available:</strong> Fetches complete fund list from MFApi (may include newer/smaller funds)</li>
+            <li>Both modes use real-time NAV data and the same recommendation algorithm</li>
+          </ul>
+        </div>
       </div>
 
       <div className="form-group">

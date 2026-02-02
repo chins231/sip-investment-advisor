@@ -35,6 +35,11 @@ def generate_recommendations():
         if max_funds is not None:
             max_funds = int(max_funds)
         
+        # Get fund_selection_mode (default to 'curated')
+        fund_selection_mode = data.get('fund_selection_mode', 'curated')
+        if fund_selection_mode not in ['curated', 'comprehensive']:
+            return jsonify({'error': 'fund_selection_mode must be curated or comprehensive'}), 400
+        
         # Get sector preferences if provided
         sector_preferences = data.get('sector_preferences', None)
         if sector_preferences and len(sector_preferences) > 0:
@@ -50,7 +55,8 @@ def generate_recommendations():
             investment_years=int(data['investment_years']),
             monthly_investment=float(data['monthly_investment']),
             max_funds=max_funds,
-            sector_preferences=sector_preferences
+            sector_preferences=sector_preferences,
+            fund_selection_mode=fund_selection_mode
         )
         
         # Check if user exists, create or update

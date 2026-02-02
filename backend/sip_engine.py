@@ -180,10 +180,12 @@ class SIPRecommendationEngine:
             }
         }
     
-    def generate_recommendations(self, risk_profile, investment_years, monthly_investment, max_funds=None, sector_preferences=None):
+    def generate_recommendations(self, risk_profile, investment_years, monthly_investment, max_funds=None, sector_preferences=None, fund_selection_mode='curated'):
         """
         Generate complete SIP recommendations
         If sector_preferences is provided, include sector-specific funds
+        
+        fund_selection_mode: 'curated' (static handpicked funds) or 'comprehensive' (API-fetched all funds)
         """
         # Validate inputs
         if risk_profile not in ['low_risk', 'medium_risk', 'high_risk']:
@@ -211,7 +213,9 @@ class SIPRecommendationEngine:
         # If sector preferences are specified, use sector-specific funds
         if sector_preferences and len(sector_preferences) > 0:
             from sector_funds import get_sector_funds
-            sector_funds, data_source_info = get_sector_funds(sector_preferences)
+            # Map fund_selection_mode to use_api parameter
+            use_api = (fund_selection_mode == 'comprehensive')
+            sector_funds, data_source_info = get_sector_funds(sector_preferences, use_api=use_api)
             
             # Limit to max 5 funds per sector to avoid overwhelming user
             max_funds_per_request = 10
