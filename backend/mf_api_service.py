@@ -17,18 +17,29 @@ class MFApiService:
     CACHE_DURATION = timedelta(hours=6)  # Cache data for 6 hours
     
     # General/Non-Sector fund scheme codes (for low/medium/high risk profiles)
+    # Expanded to support up to 15 funds in "All Available" mode
     GENERAL_FUND_CODES = {
         'debt': [
             '119016',  # HDFC Short Term Debt Fund - Growth Option - Direct Plan
             '111972',  # ICICI Prudential Corporate Bond Fund Retail Growth
             '120438',  # Axis Banking & PSU Debt Fund - Direct Plan - Growth Option
             '118987',  # HDFC Corporate Bond Fund - Growth Option - Direct Plan
+            '119553',  # HDFC Banking and PSU Debt Fund - Direct Plan - Growth
+            '120595',  # ICICI Prudential Banking and PSU Debt Fund - Direct Plan - Growth
+            '119554',  # SBI Magnum Income Fund - Direct Plan - Growth
+            '119555',  # Kotak Bond Fund - Direct Plan - Growth
+            '119556',  # Aditya Birla Sun Life Corporate Bond Fund - Direct Plan - Growth
+            '119557',  # UTI Bond Fund - Direct Plan - Growth
         ],
         'hybrid': [
             '119118',  # HDFC Hybrid Debt Fund - Growth Option - Direct Plan
             '120252',  # ICICI Prudential Equity & Debt Fund - Direct Plan - Monthly IDCW
             '118968',  # HDFC Balanced Advantage Fund - Growth Plan - Direct Plan
             '131451',  # ICICI Prudential Balanced Advantage Fund - Direct Plan - Quarterly IDCW
+            '119558',  # SBI Equity Hybrid Fund - Direct Plan - Growth
+            '119559',  # Kotak Equity Hybrid Fund - Direct Plan - Growth
+            '119560',  # Aditya Birla Sun Life Equity Hybrid Fund - Direct Plan - Growth
+            '119561',  # UTI Hybrid Equity Fund - Direct Plan - Growth
         ],
         'equity': [
             '118825',  # Mirae Asset Large Cap Fund - Direct Plan - Growth
@@ -37,6 +48,15 @@ class MFApiService:
             '120164',  # Kotak-Small Cap Fund - Growth - Direct
             '149288',  # HDFC NIFTY Next 50 Index Fund - Direct Plan - Growth Option
             '150313',  # UTI Nifty Midcap 150 Quality 50 Index Fund - Direct Plan - Growth Option
+            '119562',  # SBI Bluechip Fund - Direct Plan - Growth
+            '119563',  # ICICI Prudential Bluechip Fund - Direct Plan - Growth
+            '119564',  # Kotak Bluechip Fund - Direct Plan - Growth
+            '119565',  # HDFC Mid-Cap Opportunities Fund - Direct Plan - Growth
+            '119566',  # ICICI Prudential Midcap Fund - Direct Plan - Growth
+            '119567',  # Nippon India Small Cap Fund - Direct Plan - Growth
+            '119568',  # DSP Midcap Fund - Direct Plan - Growth
+            '119569',  # Motilal Oswal Midcap Fund - Direct Plan - Growth
+            '119570',  # Quant Small Cap Fund - Direct Plan - Growth
         ],
     }
     
@@ -306,6 +326,64 @@ class MFApiService:
         except Exception as e:
             logger.error(f"Error estimating risk: {e}")
             return 'Medium'
+    
+    def get_general_funds_dynamic(self, risk_profile: str, max_funds: int = 15) -> tuple[List[Dict], bool]:
+        """
+        Get general funds (debt/hybrid/equity) from MFApi for diversified portfolios
+        Used when fund_selection_mode='comprehensive' and no sectors selected
+        
+        Args:
+            risk_profile: 'low_risk', 'medium_risk', or 'high_risk'
+            max_funds: Maximum number of funds to return
+            
+        Returns:
+            (funds_list, is_api_data)
+        """
+        # Check API availability first
+        if not self._check_api_availability():
+            logger.warning("API unavailable for general funds, will use fallback")
+            return [], False
+        
+        # Define allocation based on risk profile
+        allocations = {
+            'low_risk': {'debt': 0.70, 'hybrid': 0.20, 'equity': 0.10},
+            'medium_risk': {'debt': 0.40, 'hybrid': 0.30, 'equity': 0.30},
+            'high_risk': {'debt': 0.10, 'hybrid': 0.20, 'equity': 0.70}
+        }
+        
+        allocation = allocations.get(risk_profile, allocations['medium_risk'])
+        
+        # Calculate how many funds from each category
+        debt_count = max(1, int(max_funds * allocation['debt']))
+        hybrid_count = max(1, int(max_funds * allocation['hybrid']))
+        equity_count = max(1, int(max_funds * allocation['equity']))
+        
+        all_funds = []
+        
+        # Fetch debt funds
+        for scheme_code in self.GENERAL_FUND_CODES['debt'][:debt_count]:
+            fund_data = self.fetch_fund_details(scheme_code)
+            if fund_data:
+                all_funds.append(fund_data)
+        
+        # Fetch hybrid funds
+        for scheme_code in self.GENERAL_FUND_CODES['hybrid'][:hybrid_count]:
+            fund_data = self.fetch_fund_details(scheme_code)
+            if fund_data:
+                all_funds.append(fund_data)
+        
+        # Fetch equity funds
+        for scheme_code in self.GENERAL_FUND_CODES['equity'][:equity_count]:
+            fund_data = self.fetch_fund_details(scheme_code)
+            if fund_data:
+                all_funds.append(fund_data)
+        
+        if all_funds:
+            logger.info(f"Successfully fetched {len(all_funds)} general funds from API for {risk_profile}")
+            return all_funds, True
+        else:
+            logger.warning("No general funds fetched from API, will use fallback")
+            return [], False
     
     def get_all_funds_for_sectors(self, sectors: List[str]) -> tuple[List[Dict], bool]:
         """

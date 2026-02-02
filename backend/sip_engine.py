@@ -246,19 +246,85 @@ class SIPRecommendationEngine:
                         rec['fund_house'] = fund.get('fund_house')
                     recommendations.append(rec)
         else:
-            # Use traditional diversified approach
-            for category, details in returns['category_wise'].items():
-                for fund in details['funds']:
-                    raw_monthly_investment = details['monthly_investment'] / len(details['funds'])
-                    recommendations.append({
-                        'fund_name': fund,
-                        'fund_type': category.replace('_', ' ').title(),
-                        'allocation_percentage': details['allocation_percentage'] / len(details['funds']),
-                        'monthly_investment': self.round_sip_amount(raw_monthly_investment),
-                        'expected_return': details['expected_return_percentage'],
-                        'risk_level': risk_profile.replace('_', ' ').title(),
-                        'has_holdings': False
-                    })
+            # Diversified portfolio (no sectors selected)
+            # Try to fetch from MFApi if comprehensive mode is selected
+            if fund_selection_mode == 'comprehensive' and max_funds:
+                try:
+                    from mf_api_service import mf_api_service
+                    api_funds, is_api_data = mf_api_service.get_general_funds_dynamic(risk_profile, max_funds)
+                    
+                    if is_api_data and api_funds:
+                        # Successfully fetched from API
+                        allocation_per_fund = 100 / len(api_funds)
+                        for fund in api_funds:
+                            raw_monthly_investment = monthly_investment * (allocation_per_fund / 100)
+                            rec = {
+                                'fund_name': fund['name'],
+                                'fund_type': fund['type'],
+                                'allocation_percentage': allocation_per_fund,
+                                'monthly_investment': self.round_sip_amount(raw_monthly_investment),
+                                'expected_return': fund['expected_return'],
+                                'risk_level': fund['risk_level'],
+                                'has_holdings': False,
+                                'nav': fund.get('nav'),
+                                'nav_date': fund.get('nav_date'),
+                                'scheme_code': fund.get('scheme_code'),
+                                'fund_house': fund.get('fund_house'),
+                                'is_dynamic': True
+                            }
+                            recommendations.append(rec)
+                        
+                        data_source_info = {
+                            'source': 'api',
+                            'api_name': 'MFApi',
+                            'fund_count': len(api_funds),
+                            'has_live_nav': True,
+                            'mode': 'comprehensive'
+                        }
+                    else:
+                        # API failed, use fallback
+                        data_source_info = {
+                            'source': 'static',
+                            'reason': 'api_unavailable',
+                            'mode': 'comprehensive_fallback',
+                            'message': 'MFApi is currently unavailable. Showing curated funds as fallback.'
+                        }
+                        # Fall through to static approach below
+                        fund_selection_mode = 'curated'  # Force fallback to static
+                except Exception as e:
+                    import logging
+                    logging.error(f"Error fetching general funds from API: {e}")
+                    data_source_info = {
+                        'source': 'static',
+                        'reason': 'api_error',
+                        'mode': 'comprehensive_fallback',
+                        'message': f'Error fetching from MFApi: {str(e)}. Showing curated funds as fallback.'
+                    }
+                    fund_selection_mode = 'curated'  # Force fallback to static
+            
+            # Use static funds if curated mode OR if API fetch failed
+            if fund_selection_mode == 'curated' or not recommendations:
+                for category, details in returns['category_wise'].items():
+                    for fund in details['funds']:
+                        raw_monthly_investment = details['monthly_investment'] / len(details['funds'])
+                        recommendations.append({
+                            'fund_name': fund,
+                            'fund_type': category.replace('_', ' ').title(),
+                            'allocation_percentage': details['allocation_percentage'] / len(details['funds']),
+                            'monthly_investment': self.round_sip_amount(raw_monthly_investment),
+                            'expected_return': details['expected_return_percentage'],
+                            'risk_level': risk_profile.replace('_', ' ').title(),
+                            'has_holdings': False
+                        })
+                
+                # Add data source info for static/curated mode
+                if not data_source_info:
+                    data_source_info = {
+                        'source': 'static',
+                        'mode': 'curated',
+                        'fund_count': len(recommendations),
+                        'message': 'Showing curated funds selected by experts.'
+                    }
         
         # Limit number of funds if max_funds is specified
         if max_funds is not None and len(recommendations) > max_funds:
