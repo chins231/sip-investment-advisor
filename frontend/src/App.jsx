@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InvestmentForm from './components/InvestmentForm';
 import RecommendationResults from './components/RecommendationResults';
 import InvestmentPlatforms from './components/InvestmentPlatforms';
@@ -11,6 +11,60 @@ function App() {
   const [results, setResults] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingStage, setLoadingStage] = useState(0);
+
+  // Progressive loading messages for cold start detection
+  useEffect(() => {
+    if (!loading) {
+      setLoadingStage(0);
+      setLoadingMessage('');
+      return;
+    }
+
+    // Stage 1: Initial (0-3 seconds)
+    setLoadingStage(1);
+    setLoadingMessage('Analyzing your profile and generating recommendations...');
+
+    // Stage 2: Normal processing (3-10 seconds)
+    const timer1 = setTimeout(() => {
+      if (loading) {
+        setLoadingStage(2);
+        setLoadingMessage('Fetching real-time fund data from market APIs...');
+      }
+    }, 3000);
+
+    // Stage 3: Cold start detected (10-20 seconds)
+    const timer2 = setTimeout(() => {
+      if (loading) {
+        setLoadingStage(3);
+        setLoadingMessage('⏳ Backend is waking up (first request after idle). This may take 30-60 seconds...');
+      }
+    }, 10000);
+
+    // Stage 4: Still processing (20-40 seconds)
+    const timer3 = setTimeout(() => {
+      if (loading) {
+        setLoadingStage(4);
+        setLoadingMessage('🔄 Almost there! Backend is initializing and processing your request...');
+      }
+    }, 20000);
+
+    // Stage 5: Taking longer than expected (40+ seconds)
+    const timer4 = setTimeout(() => {
+      if (loading) {
+        setLoadingStage(5);
+        setLoadingMessage('⚡ Finalizing your personalized recommendations. Thank you for your patience!');
+      }
+    }, 40000);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+    };
+  }, [loading]);
 
   const handleFormSubmit = async (formData) => {
     setLoading(true);
@@ -67,7 +121,60 @@ function App() {
           {loading && (
             <div className="loading">
               <div className="spinner"></div>
-              <p>Analyzing your profile and generating recommendations...</p>
+              <p style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '1rem' }}>
+                {loadingMessage}
+              </p>
+              
+              {/* Progress bar */}
+              <div style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: '#e0e0e0',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                marginBottom: '1.5rem'
+              }}>
+                <div style={{
+                  width: `${loadingStage * 20}%`,
+                  height: '100%',
+                  backgroundColor: '#4CAF50',
+                  transition: 'width 0.5s ease-in-out',
+                  animation: loadingStage >= 3 ? 'pulse 1.5s ease-in-out infinite' : 'none'
+                }}></div>
+              </div>
+              
+              {/* Cold start explanation (appears after 10 seconds) */}
+              {loadingStage >= 3 && (
+                <div style={{
+                  backgroundColor: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  marginTop: '1rem',
+                  textAlign: 'left',
+                  animation: 'fadeIn 0.5s ease-in'
+                }}>
+                  <h4 style={{ margin: '0 0 0.5rem 0', color: '#856404' }}>
+                    ⏳ Why is this taking longer?
+                  </h4>
+                  <p style={{ margin: '0', fontSize: '0.9rem', color: '#856404', lineHeight: '1.5' }}>
+                    Our backend service was idle and is now waking up. This is normal for the first request
+                    after a period of inactivity. <strong>Subsequent requests will be much faster!</strong>
+                  </p>
+                </div>
+              )}
+              
+              {/* Encouraging message for very long waits */}
+              {loadingStage >= 5 && (
+                <p style={{
+                  marginTop: '1rem',
+                  fontSize: '0.95rem',
+                  color: '#666',
+                  fontStyle: 'italic'
+                }}>
+                  🎯 Your personalized recommendations will be worth the wait!
+                </p>
+              )}
             </div>
           )}
 
