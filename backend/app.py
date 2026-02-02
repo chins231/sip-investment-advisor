@@ -27,6 +27,23 @@ with app.app_context():
 from routes import api
 app.register_blueprint(api, url_prefix='/api')
 
+# Root route - API information
+@app.route('/', methods=['GET'])
+def root():
+    return jsonify({
+        'service': 'SIP Investment Advisor API',
+        'status': 'running',
+        'version': '2.0.0',
+        'description': 'Backend API for personalized mutual fund recommendations',
+        'endpoints': {
+            'health': '/api/health',
+            'recommendations': '/api/recommendations',
+            'user_profile': '/api/user/profile'
+        },
+        'frontend_url': 'https://sip-investment-advisor.vercel.app',
+        'documentation': 'Visit the frontend URL to use the application'
+    })
+
 # Routes
 @app.route('/api/health', methods=['GET'])
 def health_check():
