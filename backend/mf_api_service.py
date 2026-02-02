@@ -16,6 +16,19 @@ class MFApiService:
     BASE_URL = "https://api.mfapi.in"
     CACHE_DURATION = timedelta(hours=6)  # Cache data for 6 hours
     
+    # General/Non-Sector fund scheme codes (for low/medium/high risk profiles)
+    GENERAL_FUND_CODES = {
+        'debt': [
+            '119016',  # HDFC Short Term Debt Fund - Growth Option - Direct Plan
+            '111972',  # ICICI Prudential Corporate Bond Fund Retail Growth
+            '120438',  # Axis Banking & PSU Debt Fund - Direct Plan - Growth Option
+        ],
+        'hybrid': [
+            '119118',  # HDFC Hybrid Debt Fund - Growth Option - Direct Plan
+            '120252',  # ICICI Prudential Equity & Debt Fund - Direct Plan - Monthly IDCW
+        ],
+    }
+    
     # Sector-wise fund scheme codes (AMFI codes) - All Direct Plan Growth options
     SECTOR_FUND_CODES = {
         'metal': [
@@ -230,7 +243,23 @@ class MFApiService:
                     logger.debug(f"Error checking cached fund: {e}")
                     continue
         
-        # If not in cache, search through all sector funds
+        # If not in cache, search through general funds first (debt/hybrid)
+        for general_codes in self.GENERAL_FUND_CODES.values():
+            for scheme_code in general_codes:
+                fund_data = self.fetch_fund_details(scheme_code)
+                if fund_data:
+                    try:
+                        scheme_name = fund_data.get('meta', {}).get('scheme_name', '')
+                        if scheme_name and fund_name.lower() in scheme_name.lower():
+                            latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else None
+                            if latest_nav:
+                                logger.info(f"Found NAV {latest_nav} for {fund_name} via general funds API search")
+                                return latest_nav
+                    except Exception as e:
+                        logger.debug(f"Error parsing general fund data: {e}")
+                        continue
+        
+        # If not found in general funds, search through sector funds
         for sector_codes in self.SECTOR_FUND_CODES.values():
             for scheme_code in sector_codes:
                 fund_data = self.fetch_fund_details(scheme_code)
@@ -240,10 +269,10 @@ class MFApiService:
                         if scheme_name and fund_name.lower() in scheme_name.lower():
                             latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else None
                             if latest_nav:
-                                logger.info(f"Found NAV {latest_nav} for {fund_name} via API search")
+                                logger.info(f"Found NAV {latest_nav} for {fund_name} via sector funds API search")
                                 return latest_nav
                     except Exception as e:
-                        logger.debug(f"Error parsing fund data: {e}")
+                        logger.debug(f"Error parsing sector fund data: {e}")
                         continue
         
         logger.warning(f"Could not find NAV for fund: {fund_name}")
