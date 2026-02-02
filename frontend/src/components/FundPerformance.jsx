@@ -216,9 +216,31 @@ const FundPerformance = ({ fundName }) => {
             ⭐ User Reviews ({performanceData.reviews.total_reviews})
           </h4>
           
-          <div style={{ 
-            background: '#f8fafc', 
-            padding: '1rem', 
+          {/* Disclaimer Banner */}
+          <div style={{
+            background: '#fef3c7',
+            border: '2px solid #fbbf24',
+            borderRadius: '8px',
+            padding: '1rem',
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'start',
+            gap: '0.75rem'
+          }}>
+            <span style={{ fontSize: '1.25rem' }}>ℹ️</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: '600', color: '#92400e', marginBottom: '0.25rem' }}>
+                Sample Reviews for Demonstration
+              </div>
+              <div style={{ fontSize: '0.875rem', color: '#78350f', lineHeight: '1.5' }}>
+                These are simulated reviews for demonstration purposes only. Real user reviews coming soon!
+              </div>
+            </div>
+          </div>
+          
+          <div style={{
+            background: '#f8fafc',
+            padding: '1rem',
             borderRadius: '8px',
             marginBottom: '1rem'
           }}>
