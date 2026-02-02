@@ -723,13 +723,16 @@ class MFApiService:
                 
                 # Filter for funds with "Index" or "Nifty" in name (case-insensitive)
                 for fund in all_funds:
-                    scheme_name = fund.get('schemeCode', '')
+                    scheme_name = fund.get('schemeName', '')
                     scheme_code = str(fund.get('schemeCode', ''))
                     
                     # Check if it's an index fund
-                    if scheme_code and ('index' in scheme_name.lower() or 'nifty' in scheme_name.lower()):
-                        # Exclude FoF (Fund of Funds) and other non-pure index funds
-                        if 'fof' not in scheme_name.lower() and 'fund of fund' not in scheme_name.lower():
+                    if scheme_code and scheme_name and ('index' in scheme_name.lower() or 'nifty' in scheme_name.lower()):
+                        # Exclude FoF (Fund of Funds), ELSS, and other non-pure index funds
+                        if ('fof' not in scheme_name.lower() and
+                            'fund of fund' not in scheme_name.lower() and
+                            'elss' not in scheme_name.lower() and
+                            'tax saver' not in scheme_name.lower()):
                             index_fund_codes.append(scheme_code)
                 
                 logger.info(f"Discovered {len(index_fund_codes)} index funds dynamically")
