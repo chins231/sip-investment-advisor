@@ -36,6 +36,8 @@ class FundDataService:
         }
         # Cache for MFApi NAV data
         self._nav_cache = {}
+        # Cache for returns data to ensure consistency
+        self._returns_cache = {}
     
     def get_current_nav(self, fund_name):
         """
@@ -104,11 +106,15 @@ class FundDataService:
             return random.uniform(0.12, 0.18)  # 12-18% for equity
     
     def calculate_returns(self, fund_name):
-        """Calculate returns for different periods"""
+        """Calculate returns for different periods - cached for consistency"""
+        # Check cache first
+        if fund_name in self._returns_cache:
+            return self._returns_cache[fund_name]
+        
         current_nav = self.get_current_nav(fund_name)
         base_return = self._get_base_return(fund_name)
         
-        # Calculate returns with some randomness
+        # Calculate returns with some randomness (only once, then cached)
         returns = {
             '7D': round(base_return * (7/365) + random.uniform(-0.01, 0.01), 2),
             '1M': round(base_return * (30/365) + random.uniform(-0.02, 0.02), 2),
@@ -117,7 +123,7 @@ class FundDataService:
             '1Y': round(base_return + random.uniform(-0.05, 0.05), 2)
         }
         
-        return {
+        result = {
             'current_nav': current_nav,
             'returns': {
                 '7_days': returns['7D'] * 100,
@@ -127,6 +133,10 @@ class FundDataService:
                 '1_year': returns['1Y'] * 100
             }
         }
+        
+        # Cache the result
+        self._returns_cache[fund_name] = result
+        return result
     
     def get_fund_reviews(self, fund_name):
         """

@@ -18,11 +18,12 @@ const FundPerformance = ({ fundName }) => {
 
   useEffect(() => {
     fetchPerformanceData();
-  }, [fundName, selectedPeriod]);
+  }, [fundName]); // Only re-fetch when fund name changes, not period
 
   const fetchPerformanceData = async () => {
     try {
       setLoading(true);
+      // Fetch data for the selected period to get the correct historical chart data
       const response = await api.get(
         `/fund-performance/${encodeURIComponent(fundName)}?period=${selectedPeriod}`
       );
@@ -35,6 +36,13 @@ const FundPerformance = ({ fundName }) => {
       setLoading(false);
     }
   };
+  
+  // Fetch data when period changes (for chart data only)
+  useEffect(() => {
+    if (fundName && selectedPeriod) {
+      fetchPerformanceData();
+    }
+  }, [selectedPeriod]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
