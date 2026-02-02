@@ -95,9 +95,20 @@ def generate_recommendations():
         
         db.session.commit()
         
-        # Enrich recommendations with holdings data
+        # Enrich recommendations with NAV and holdings data
         enriched_recommendations = []
         for rec in recommendations['recommendations']:
+            # Add NAV data if not already present (for non-sector funds)
+            if 'nav' not in rec or rec.get('nav') is None:
+                try:
+                    nav = fund_service.get_current_nav(rec['fund_name'])
+                    if nav and nav != 100.00:  # 100.00 is the default fallback
+                        rec['nav'] = nav
+                        rec['nav_date'] = 'Latest'
+                        rec['data_source'] = 'static_fallback'
+                except Exception as e:
+                    print(f"Failed to get NAV for {rec['fund_name']}: {e}")
+            
             # Get holdings for this fund
             holdings_data = holdings_service.get_holdings(rec)
             if holdings_data:
