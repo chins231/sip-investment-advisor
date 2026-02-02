@@ -327,6 +327,217 @@ class MFApiService:
             logger.error(f"Error estimating risk: {e}")
             return 'Medium'
     
+    def calculate_cagr(self, scheme_code: str, years: int = 3) -> Optional[float]:
+        """
+        Calculate CAGR (Compound Annual Growth Rate) for a fund
+        
+        Args:
+            scheme_code: AMFI scheme code
+            years: Number of years for CAGR calculation (default: 3)
+            
+        Returns:
+            CAGR as percentage (e.g., 15.5 for 15.5% CAGR) or None if data unavailable
+        """
+        try:
+            fund_data = self.fetch_fund_details(scheme_code)
+            if not fund_data or 'data' not in fund_data or len(fund_data['data']) < 2:
+                return None
+            
+            # Get current NAV (most recent)
+            current_nav = float(fund_data['data'][0]['nav'])
+            
+            # Calculate days for the period
+            days_needed = years * 365
+            
+            # Find NAV closest to N years ago
+            target_date = datetime.now() - timedelta(days=days_needed)
+            old_nav = None
+            actual_days = 0
+            
+            for entry in reversed(fund_data['data']):
+                entry_date = datetime.strptime(entry['date'], '%d-%m-%Y')
+                if entry_date <= target_date:
+                    old_nav = float(entry['nav'])
+                    actual_days = (datetime.now() - entry_date).days
+                    break
+            
+            if not old_nav or actual_days < (years * 365 * 0.9):  # At least 90% of target period
+                # Try 1-year CAGR as fallback
+                if years > 1:
+                    return self.calculate_cagr(scheme_code, years=1)
+                return None
+            
+            # Calculate CAGR: ((Current/Old)^(1/years)) - 1
+            actual_years = actual_days / 365.0
+            cagr = (pow(current_nav / old_nav, 1 / actual_years) - 1) * 100
+            
+            logger.info(f"CAGR for {scheme_code}: {cagr:.2f}% over {actual_years:.1f} years")
+            return round(cagr, 2)
+            
+        except Exception as e:
+            logger.error(f"Error calculating CAGR for {scheme_code}: {e}")
+            return None
+    
+    def rank_funds_by_performance(self, scheme_codes: List[str]) -> List[tuple[str, float]]:
+        """
+        Rank funds by 3-year CAGR performance
+        
+        Args:
+            scheme_codes: List of AMFI scheme codes
+            
+        Returns:
+            List of (scheme_code, cagr) tuples sorted by CAGR (highest first)
+        """
+        fund_performance = []
+        
+        for scheme_code in scheme_codes:
+            cagr = self.calculate_cagr(scheme_code, years=3)
+            if cagr is not None:
+                fund_performance.append((scheme_code, cagr))
+            else:
+                # If CAGR unavailable, assign low score to put at end
+                fund_performance.append((scheme_code, -999.0))
+        
+        # Sort by CAGR (highest first)
+        fund_performance.sort(key=lambda x: x[1], reverse=True)
+        
+        logger.info(f"Ranked {len(fund_performance)} funds by performance")
+        return fund_performance
+    
+    def get_general_funds_curated(self, risk_profile: str, max_funds: int = 15) -> tuple[List[Dict], bool]:
+        """
+        Get TOP PERFORMING general funds using 3-year CAGR ranking
+        Used when fund_selection_mode='curated' and no sectors selected
+        
+        This method:
+        1. Fetches ALL available funds from GENERAL_FUND_CODES
+        2. Calculates 3-year CAGR for each fund
+        3. Ranks funds by performance (highest CAGR first)
+        4. Selects top N funds based on risk profile allocation
+        
+        Args:
+            risk_profile: 'low_risk', 'medium_risk', or 'high_risk'
+            max_funds: Maximum number of funds to return (default: 15)
+            
+        Returns:
+            Tuple of (list of fund dicts, is_api_data boolean)
+        """
+        # Check API availability
+        if not self._check_api_availability():
+            logger.warning("MFApi not available for curated funds")
+            return [], False
+        
+        # Define allocation based on risk profile
+        allocations = {
+            'low_risk': {'debt': 0.70, 'hybrid': 0.20, 'equity': 0.10},
+            'medium_risk': {'debt': 0.40, 'hybrid': 0.30, 'equity': 0.30},
+            'high_risk': {'debt': 0.10, 'hybrid': 0.20, 'equity': 0.70}
+        }
+        
+        allocation = allocations.get(risk_profile, allocations['medium_risk'])
+        
+        # Calculate fund distribution
+        debt_count = max(1, int(max_funds * allocation['debt']))
+        hybrid_count = max(1, int(max_funds * allocation['hybrid']))
+        equity_count = max(1, int(max_funds * allocation['equity']))
+        
+        # Adjust if total exceeds max_funds
+        total = debt_count + hybrid_count + equity_count
+        if total > max_funds:
+            debt_count = max(1, int(debt_count * max_funds / total))
+            hybrid_count = max(1, int(hybrid_count * max_funds / total))
+            equity_count = max_funds - debt_count - hybrid_count
+        
+        logger.info(f"Ranking funds by 3-year CAGR: {debt_count} debt, {hybrid_count} hybrid, {equity_count} equity")
+        
+        all_funds = []
+        
+        # Rank and fetch debt funds
+        debt_ranked = self.rank_funds_by_performance(self.GENERAL_FUND_CODES['debt'])
+        for scheme_code, cagr in debt_ranked[:debt_count]:
+            if cagr > -999:  # Skip funds with no CAGR data
+                fund_data = self.fetch_fund_details(scheme_code)
+                if fund_data:
+                    # Parse fund data into standard format
+                    try:
+                        latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else 0
+                        fund_info = {
+                            'name': fund_data.get('meta', {}).get('scheme_name', 'Unknown Fund'),
+                            'type': fund_data.get('meta', {}).get('scheme_category', 'Debt Fund'),
+                            'scheme_code': scheme_code,
+                            'nav': latest_nav,
+                            'nav_date': fund_data['data'][0]['date'] if fund_data.get('data') else None,
+                            'fund_house': fund_data.get('meta', {}).get('fund_house', 'Unknown'),
+                            'expected_return': self._estimate_returns(fund_data),
+                            'risk_level': self._estimate_risk(fund_data),
+                            'cagr_3y': cagr,
+                            'is_dynamic': True,
+                            'data_source': 'MFApi'
+                        }
+                        all_funds.append(fund_info)
+                    except Exception as e:
+                        logger.error(f"Error parsing debt fund {scheme_code}: {e}")
+                        continue
+        
+        # Rank and fetch hybrid funds
+        hybrid_ranked = self.rank_funds_by_performance(self.GENERAL_FUND_CODES['hybrid'])
+        for scheme_code, cagr in hybrid_ranked[:hybrid_count]:
+            if cagr > -999:
+                fund_data = self.fetch_fund_details(scheme_code)
+                if fund_data:
+                    try:
+                        latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else 0
+                        fund_info = {
+                            'name': fund_data.get('meta', {}).get('scheme_name', 'Unknown Fund'),
+                            'type': fund_data.get('meta', {}).get('scheme_category', 'Hybrid Fund'),
+                            'scheme_code': scheme_code,
+                            'nav': latest_nav,
+                            'nav_date': fund_data['data'][0]['date'] if fund_data.get('data') else None,
+                            'fund_house': fund_data.get('meta', {}).get('fund_house', 'Unknown'),
+                            'expected_return': self._estimate_returns(fund_data),
+                            'risk_level': self._estimate_risk(fund_data),
+                            'cagr_3y': cagr,
+                            'is_dynamic': True,
+                            'data_source': 'MFApi'
+                        }
+                        all_funds.append(fund_info)
+                    except Exception as e:
+                        logger.error(f"Error parsing hybrid fund {scheme_code}: {e}")
+                        continue
+        
+        # Rank and fetch equity funds
+        equity_ranked = self.rank_funds_by_performance(self.GENERAL_FUND_CODES['equity'])
+        for scheme_code, cagr in equity_ranked[:equity_count]:
+            if cagr > -999:
+                fund_data = self.fetch_fund_details(scheme_code)
+                if fund_data:
+                    try:
+                        latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else 0
+                        fund_info = {
+                            'name': fund_data.get('meta', {}).get('scheme_name', 'Unknown Fund'),
+                            'type': fund_data.get('meta', {}).get('scheme_category', 'Equity Fund'),
+                            'scheme_code': scheme_code,
+                            'nav': latest_nav,
+                            'nav_date': fund_data['data'][0]['date'] if fund_data.get('data') else None,
+                            'fund_house': fund_data.get('meta', {}).get('fund_house', 'Unknown'),
+                            'expected_return': self._estimate_returns(fund_data),
+                            'risk_level': self._estimate_risk(fund_data),
+                            'cagr_3y': cagr,
+                            'is_dynamic': True,
+                            'data_source': 'MFApi'
+                        }
+                        all_funds.append(fund_info)
+                    except Exception as e:
+                        logger.error(f"Error parsing equity fund {scheme_code}: {e}")
+                        continue
+        
+        if all_funds:
+            logger.info(f"Successfully fetched {len(all_funds)} TOP PERFORMING funds (ranked by 3-year CAGR)")
+            return all_funds, True
+        else:
+            logger.warning("No curated funds fetched, will use fallback")
+            return [], False
+    
     def get_general_funds_dynamic(self, risk_profile: str, max_funds: int = 15) -> tuple[List[Dict], bool]:
         """
         Get general funds (debt/hybrid/equity) from MFApi for diversified portfolios
@@ -364,19 +575,70 @@ class MFApiService:
         for scheme_code in self.GENERAL_FUND_CODES['debt'][:debt_count]:
             fund_data = self.fetch_fund_details(scheme_code)
             if fund_data:
-                all_funds.append(fund_data)
+                try:
+                    latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else 0
+                    fund_info = {
+                        'name': fund_data.get('meta', {}).get('scheme_name', 'Unknown Fund'),
+                        'type': fund_data.get('meta', {}).get('scheme_category', 'Debt Fund'),
+                        'scheme_code': scheme_code,
+                        'nav': latest_nav,
+                        'nav_date': fund_data['data'][0]['date'] if fund_data.get('data') else None,
+                        'fund_house': fund_data.get('meta', {}).get('fund_house', 'Unknown'),
+                        'expected_return': self._estimate_returns(fund_data),
+                        'risk_level': self._estimate_risk(fund_data),
+                        'is_dynamic': True,
+                        'data_source': 'MFApi'
+                    }
+                    all_funds.append(fund_info)
+                except Exception as e:
+                    logger.error(f"Error parsing debt fund {scheme_code}: {e}")
+                    continue
         
         # Fetch hybrid funds
         for scheme_code in self.GENERAL_FUND_CODES['hybrid'][:hybrid_count]:
             fund_data = self.fetch_fund_details(scheme_code)
             if fund_data:
-                all_funds.append(fund_data)
+                try:
+                    latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else 0
+                    fund_info = {
+                        'name': fund_data.get('meta', {}).get('scheme_name', 'Unknown Fund'),
+                        'type': fund_data.get('meta', {}).get('scheme_category', 'Hybrid Fund'),
+                        'scheme_code': scheme_code,
+                        'nav': latest_nav,
+                        'nav_date': fund_data['data'][0]['date'] if fund_data.get('data') else None,
+                        'fund_house': fund_data.get('meta', {}).get('fund_house', 'Unknown'),
+                        'expected_return': self._estimate_returns(fund_data),
+                        'risk_level': self._estimate_risk(fund_data),
+                        'is_dynamic': True,
+                        'data_source': 'MFApi'
+                    }
+                    all_funds.append(fund_info)
+                except Exception as e:
+                    logger.error(f"Error parsing hybrid fund {scheme_code}: {e}")
+                    continue
         
         # Fetch equity funds
         for scheme_code in self.GENERAL_FUND_CODES['equity'][:equity_count]:
             fund_data = self.fetch_fund_details(scheme_code)
             if fund_data:
-                all_funds.append(fund_data)
+                try:
+                    latest_nav = float(fund_data['data'][0]['nav']) if fund_data.get('data') else 0
+                    fund_info = {
+                        'name': fund_data.get('meta', {}).get('scheme_name', 'Unknown Fund'),
+                        'type': fund_data.get('meta', {}).get('scheme_category', 'Equity Fund'),
+                        'scheme_code': scheme_code,
+                        'nav': latest_nav,
+                        'nav_date': fund_data['data'][0]['date'] if fund_data.get('data') else None,
+                        'fund_house': fund_data.get('meta', {}).get('fund_house', 'Unknown'),
+                        'expected_return': self._estimate_returns(fund_data),
+                        'risk_level': self._estimate_risk(fund_data),
+                        'is_dynamic': True,
+                        'data_source': 'MFApi'
+                    }
+                    all_funds.append(fund_info)
+                except Exception as e:
+                    logger.error(f"Error parsing equity fund {scheme_code}: {e}")
+                    continue
         
         if all_funds:
             logger.info(f"Successfully fetched {len(all_funds)} general funds from API for {risk_profile}")

@@ -49,7 +49,14 @@ const RecommendationResults = ({ data }) => {
           {data_source.source === 'api' ? (
             <>
               <span className="badge-success">✓ Live Data</span>
-              <span>Showing {data_source.fund_count} funds with real-time NAV from {data_source.api_name}</span>
+              <span>
+                Showing {data_source.fund_count} funds with real-time NAV from {data_source.api_name}
+                {data_source.ranking && data_source.ranking !== 'None' && (
+                  <strong style={{ marginLeft: '8px', color: '#10b981' }}>
+                    • Ranked by {data_source.ranking}
+                  </strong>
+                )}
+              </span>
             </>
           ) : (
             <>
@@ -57,7 +64,7 @@ const RecommendationResults = ({ data }) => {
               <span>
                 {data_source.reason === 'api_unavailable'
                   ? 'API temporarily unavailable. Showing curated fund recommendations.'
-                  : `Showing ${data_source.fund_count} curated funds.`}
+                  : data_source.message || `Showing ${data_source.fund_count} curated funds.`}
               </span>
             </>
           )}
@@ -169,6 +176,14 @@ const RecommendationResults = ({ data }) => {
                   <label>Monthly SIP</label>
                   <value>{formatCurrency(rec.monthly_investment)}</value>
                 </div>
+                {rec.cagr_3y && (
+                  <div className="detail-item">
+                    <label>3-Year CAGR</label>
+                    <value style={{ color: rec.cagr_3y > 0 ? '#10b981' : '#ef4444', fontWeight: '600' }}>
+                      {formatPercentage(rec.cagr_3y)}
+                    </value>
+                  </div>
+                )}
                 {rec.nav ? (
                   <div className="detail-item">
                     <label>Current NAV</label>
