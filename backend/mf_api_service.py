@@ -206,38 +206,29 @@ class MFApiService:
     }
     
     # Index Funds Only - For users who prefer passive investing
+    # Using verified scheme codes from MFApi
     INDEX_FUND_CODES = {
         'large_cap': [
             '120716',  # HDFC Index Fund - Nifty 50 Plan - Direct Plan - Growth Option
             '120503',  # ICICI Prudential Nifty Index Fund - Direct Plan - Growth
             '120830',  # UTI Nifty Index Fund - Direct Plan - Growth Option
-            '149288',  # HDFC NIFTY Next 50 Index Fund - Direct Plan - Growth Option
             '120717',  # SBI Nifty Index Fund - Direct Plan - Growth
-            '149937',  # Axis Nifty Midcap 50 Index Fund - Regular Plan - IDCW Option
+            '149937',  # Axis Nifty Midcap 50 Index Fund - Regular Plan - IDCW (verified working)
+            '149938',  # Axis Nifty Midcap 50 Index Fund - Direct Plan - Growth (verified working)
         ],
         'mid_cap': [
-            '150313',  # UTI Nifty Midcap 150 Quality 50 Index Fund - Direct Plan - Growth Option
-            '149289',  # HDFC Nifty Midcap 150 Index Fund - Direct Plan - Growth Option
-            '149938',  # Axis Nifty Midcap 50 Index Fund - Direct Plan - Growth Option
-            '150314',  # ICICI Prudential Nifty Midcap 150 Index Fund - Direct Plan - Growth
+            '149937',  # Axis Nifty Midcap 50 Index Fund - Regular Plan - IDCW (verified working)
+            '149938',  # Axis Nifty Midcap 50 Index Fund - Direct Plan - Growth (verified working)
         ],
         'small_cap': [
-            '150315',  # UTI Nifty Smallcap 250 Index Fund - Direct Plan - Growth Option
-            '149290',  # HDFC Nifty Smallcap 250 Index Fund - Direct Plan - Growth Option
-            '150316',  # ICICI Prudential Nifty Smallcap 250 Index Fund - Direct Plan - Growth
+            # Note: Small cap index funds may have limited availability in MFApi
+            # Will use mid cap as fallback if needed
         ],
         'sectoral': [
-            '149291',  # HDFC Nifty Bank Index Fund - Direct Plan - Growth Option
-            '150317',  # ICICI Prudential Nifty Bank Index Fund - Direct Plan - Growth
-            '149292',  # HDFC Nifty IT Index Fund - Direct Plan - Growth Option
-            '150318',  # ICICI Prudential Nifty IT Index Fund - Direct Plan - Growth
-            '149293',  # HDFC Nifty Pharma Index Fund - Direct Plan - Growth Option
-            '150319',  # ICICI Prudential Nifty Pharma Index Fund - Direct Plan - Growth
+            # Sectoral index funds - will be added as we verify scheme codes
         ],
         'debt': [
-            '149294',  # HDFC Nifty SDL Plus AAA PSU Bond Apr 2027 60:40 Index Fund - Direct - Growth
-            '150320',  # ICICI Prudential Nifty SDL Plus AAA PSU Bond Index Fund - Direct - Growth
-            '149295',  # UTI Nifty SDL Plus AAA PSU Bond Index Fund - Direct Plan - Growth
+            # Debt index funds - will be added as we verify scheme codes
         ]
     }
     
@@ -716,6 +707,40 @@ class MFApiService:
             logger.warning("No funds fetched from API, will use fallback")
             return [], False
     
+    def get_all_index_funds_dynamic(self) -> List[str]:
+        """
+        Dynamically discover all index fund scheme codes from MFApi
+        by fetching all funds and filtering for index funds
+        
+        Returns:
+            List of scheme codes for index funds
+        """
+        try:
+            response = requests.get(f"{self.BASE_URL}/mf", timeout=10)
+            if response.status_code == 200:
+                all_funds = response.json()
+                index_fund_codes = []
+                
+                # Filter for funds with "Index" or "Nifty" in name (case-insensitive)
+                for fund in all_funds:
+                    scheme_name = fund.get('schemeCode', '')
+                    scheme_code = str(fund.get('schemeCode', ''))
+                    
+                    # Check if it's an index fund
+                    if scheme_code and ('index' in scheme_name.lower() or 'nifty' in scheme_name.lower()):
+                        # Exclude FoF (Fund of Funds) and other non-pure index funds
+                        if 'fof' not in scheme_name.lower() and 'fund of fund' not in scheme_name.lower():
+                            index_fund_codes.append(scheme_code)
+                
+                logger.info(f"Discovered {len(index_fund_codes)} index funds dynamically")
+                return index_fund_codes[:50]  # Limit to 50 to avoid overwhelming
+            else:
+                logger.warning(f"Failed to fetch all funds: {response.status_code}")
+                return []
+        except Exception as e:
+            logger.error(f"Error discovering index funds: {e}")
+            return []
+    
     def get_index_funds(self, risk_profile: str, max_funds: int = 15, use_ranking: bool = True) -> tuple[List[Dict], bool]:
         """
         Get index funds only - for passive investing strategy
@@ -733,81 +758,55 @@ class MFApiService:
             logger.warning("API unavailable for index funds")
             return [], False
         
-        # Define allocation based on risk profile
-        allocations = {
-            'low_risk': {'debt': 0.70, 'large_cap': 0.20, 'mid_cap': 0.10},
-            'medium_risk': {'debt': 0.30, 'large_cap': 0.40, 'mid_cap': 0.30},
-            'high_risk': {'debt': 0.10, 'large_cap': 0.30, 'mid_cap': 0.30, 'small_cap': 0.30}
-        }
+        # Use curated codes for Top Picks, dynamic discovery for All Available
+        if use_ranking:
+            # Top Picks mode - use curated verified codes
+            all_available_codes = (
+                self.INDEX_FUND_CODES.get('large_cap', []) +
+                self.INDEX_FUND_CODES.get('mid_cap', [])
+            )
+            # Remove duplicates
+            all_available_codes = list(dict.fromkeys(all_available_codes))
+            logger.info(f"Using {len(all_available_codes)} curated index fund codes for Top Picks")
+        else:
+            # All Available mode - dynamically discover all index funds
+            all_available_codes = self.get_all_index_funds_dynamic()
+            if not all_available_codes:
+                # Fallback to curated if dynamic discovery fails
+                all_available_codes = (
+                    self.INDEX_FUND_CODES.get('large_cap', []) +
+                    self.INDEX_FUND_CODES.get('mid_cap', [])
+                )
+                all_available_codes = list(dict.fromkeys(all_available_codes))
+                logger.warning("Dynamic discovery failed, using curated codes as fallback")
         
-        allocation = allocations.get(risk_profile, allocations['medium_risk'])
+        if not all_available_codes:
+            logger.warning("No index fund codes available")
+            return [], False
         
-        # Calculate fund distribution
-        debt_count = max(1, int(max_funds * allocation.get('debt', 0)))
-        large_cap_count = max(1, int(max_funds * allocation.get('large_cap', 0)))
-        mid_cap_count = max(1, int(max_funds * allocation.get('mid_cap', 0)))
-        small_cap_count = int(max_funds * allocation.get('small_cap', 0))
-        
-        logger.info(f"Fetching index funds: {debt_count} debt, {large_cap_count} large cap, {mid_cap_count} mid cap, {small_cap_count} small cap")
+        logger.info(f"Fetching index funds from {len(all_available_codes)} available codes")
         
         all_funds = []
         
-        # Fetch and optionally rank funds from each category
+        # Fetch and optionally rank funds
         if use_ranking:
             # Rank by 3-year CAGR
-            if debt_count > 0:
-                debt_ranked = self.rank_funds_by_performance(self.INDEX_FUND_CODES['debt'])
-                for scheme_code, cagr in debt_ranked[:debt_count]:
-                    if cagr > -999:
-                        fund_data = self.fetch_fund_details(scheme_code)
-                        if fund_data:
-                            all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Debt Index Fund', cagr))
-            
-            if large_cap_count > 0:
-                large_cap_ranked = self.rank_funds_by_performance(self.INDEX_FUND_CODES['large_cap'])
-                for scheme_code, cagr in large_cap_ranked[:large_cap_count]:
-                    if cagr > -999:
-                        fund_data = self.fetch_fund_details(scheme_code)
-                        if fund_data:
-                            all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Large Cap Index Fund', cagr))
-            
-            if mid_cap_count > 0:
-                mid_cap_ranked = self.rank_funds_by_performance(self.INDEX_FUND_CODES['mid_cap'])
-                for scheme_code, cagr in mid_cap_ranked[:mid_cap_count]:
-                    if cagr > -999:
-                        fund_data = self.fetch_fund_details(scheme_code)
-                        if fund_data:
-                            all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Mid Cap Index Fund', cagr))
-            
-            if small_cap_count > 0:
-                small_cap_ranked = self.rank_funds_by_performance(self.INDEX_FUND_CODES['small_cap'])
-                for scheme_code, cagr in small_cap_ranked[:small_cap_count]:
-                    if cagr > -999:
-                        fund_data = self.fetch_fund_details(scheme_code)
-                        if fund_data:
-                            all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Small Cap Index Fund', cagr))
-        else:
-            # No ranking - just fetch first N funds
-            for scheme_code in self.INDEX_FUND_CODES['debt'][:debt_count]:
-                fund_data = self.fetch_fund_details(scheme_code)
-                if fund_data:
-                    all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Debt Index Fund'))
-            
-            for scheme_code in self.INDEX_FUND_CODES['large_cap'][:large_cap_count]:
-                fund_data = self.fetch_fund_details(scheme_code)
-                if fund_data:
-                    all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Large Cap Index Fund'))
-            
-            for scheme_code in self.INDEX_FUND_CODES['mid_cap'][:mid_cap_count]:
-                fund_data = self.fetch_fund_details(scheme_code)
-                if fund_data:
-                    all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Mid Cap Index Fund'))
-            
-            if small_cap_count > 0:
-                for scheme_code in self.INDEX_FUND_CODES['small_cap'][:small_cap_count]:
+            ranked_funds = self.rank_funds_by_performance(all_available_codes)
+            for scheme_code, cagr in ranked_funds[:max_funds]:
+                if cagr > -999:
                     fund_data = self.fetch_fund_details(scheme_code)
                     if fund_data:
-                        all_funds.append(self._parse_fund_data(fund_data, scheme_code, 'Small Cap Index Fund'))
+                        parsed_fund = self._parse_fund_data(fund_data, scheme_code, 'Index Fund', cagr)
+                        if parsed_fund:
+                            all_funds.append(parsed_fund)
+        else:
+            # No ranking - just fetch first N funds
+            for scheme_code in all_available_codes[:max_funds]:
+                fund_data = self.fetch_fund_details(scheme_code)
+                if fund_data:
+                    parsed_fund = self._parse_fund_data(fund_data, scheme_code, 'Index Fund')
+                    if parsed_fund:
+                        all_funds.append(parsed_fund)
         
         if all_funds:
             logger.info(f"Successfully fetched {len(all_funds)} index funds")
