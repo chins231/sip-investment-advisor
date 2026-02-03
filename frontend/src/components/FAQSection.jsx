@@ -289,16 +289,16 @@ const FAQSection = () => {
           Check out these excellent YouTube channels for investment education:
         </p>
         <div style={{ display: 'grid', gap: '0.5rem' }}>
-          <a href="https://www.youtube.com/@FreefincalTV" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
+          <a href="https://www.youtube.com/@freefincal" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
             📺 Freefincal - Detailed mutual fund analysis
           </a>
-          <a href="https://www.youtube.com/@LaboratoryGrowth" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
+          <a href="https://www.youtube.com/@LabourLawAdvisor" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
             📺 Labour Law Advisor - SIP strategies
           </a>
-          <a href="https://www.youtube.com/@AshuSehrawat" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
+          <a href="https://www.youtube.com/@AssetYogi" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
             📺 Asset Yogi - Beginner-friendly content
           </a>
-          <a href="https://www.youtube.com/@pranjalkamra" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
+          <a href="https://www.youtube.com/@FinancialEducationbyPranjalKamra" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
             📺 Pranjal Kamra - Financial planning
           </a>
         </div>
