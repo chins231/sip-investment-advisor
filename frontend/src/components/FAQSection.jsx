@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const [isSectionExpanded, setIsSectionExpanded] = useState(false);
+  const [openCategories, setOpenCategories] = useState({});
 
   const faqs = [
     {
@@ -191,26 +193,96 @@ const FAQSection = () => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const toggleCategory = (categoryIndex) => {
+    setOpenCategories(prev => ({
+      ...prev,
+      [categoryIndex]: !prev[categoryIndex]
+    }));
+  };
+
+  // Count total questions
+  const totalQuestions = faqs.reduce((sum, category) => sum + category.questions.length, 0);
+
   return (
     <div className="card" style={{ marginTop: '2rem' }}>
-      <h2>❓ Frequently Asked Questions</h2>
-      <p style={{ color: '#64748b', marginBottom: '2rem' }}>
-        Everything you need to know about SIP investing. Click on any question to see the answer!
-      </p>
+      {/* Collapsible Header */}
+      <div
+        onClick={() => setIsSectionExpanded(!isSectionExpanded)}
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          cursor: 'pointer',
+          padding: '1rem',
+          background: 'linear-gradient(135deg, #00796B 0%, #00897B 100%)',
+          color: 'white',
+          borderRadius: '8px',
+          marginBottom: isSectionExpanded ? '1.5rem' : '0',
+          transition: 'all 0.3s ease'
+        }}
+      >
+        <div>
+          <h2 style={{ margin: 0, color: 'white' }}>
+            📚 Frequently Asked Questions
+          </h2>
+          <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', opacity: 0.9 }}>
+            {totalQuestions} topics covering SIP basics, risks, taxes, and more
+          </p>
+        </div>
+        <span style={{
+          fontSize: '1.5rem',
+          transition: 'transform 0.3s',
+          transform: isSectionExpanded ? 'rotate(180deg)' : 'rotate(0deg)'
+        }}>
+          ▼
+        </span>
+      </div>
 
-      {faqs.map((category, catIndex) => (
-        <div key={catIndex} style={{ marginBottom: '2rem' }}>
-          <h3 style={{ 
-            background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-            color: 'white',
-            padding: '1rem',
-            borderRadius: '8px',
-            marginBottom: '1rem'
-          }}>
-            {category.category}
-          </h3>
+      {/* Collapsible Content */}
+      {isSectionExpanded && (
+        <div style={{ animation: 'fadeIn 0.3s ease-in' }}>
+          <p style={{ color: '#64748b', marginBottom: '2rem' }}>
+            Everything you need to know about SIP investing. Click on any question to see the answer!
+          </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {faqs.map((category, catIndex) => {
+            const isCategoryOpen = openCategories[catIndex] === true; // Default closed
+            
+            return (
+              <div key={catIndex} style={{ marginBottom: '1.5rem' }}>
+                <h3
+                  onClick={() => toggleCategory(catIndex)}
+                  style={{
+                    background: 'linear-gradient(135deg, #004D40 0%, #00695C 100%)',
+                    color: 'white',
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    marginBottom: isCategoryOpen ? '1rem' : '0',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    transition: 'all 0.3s ease',
+                    userSelect: 'none'
+                  }}
+                >
+                  <span>{category.category}</span>
+                  <span style={{
+                    fontSize: '1.25rem',
+                    transition: 'transform 0.3s',
+                    transform: isCategoryOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                  }}>
+                    ▼
+                  </span>
+                </h3>
+
+                {isCategoryOpen && (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem',
+                    animation: 'fadeIn 0.3s ease-in'
+                  }}>
             {category.questions.map((faq, qIndex) => {
               const index = `${catIndex}-${qIndex}`;
               const isOpen = openIndex === index;
@@ -246,38 +318,18 @@ const FAQSection = () => {
                       <p style={{ whiteSpace: 'pre-line', lineHeight: '1.8', color: '#475569' }}>
                         {faq.a}
                       </p>
-                      {faq.video && (
-                        <a
-                          href={faq.video}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            marginTop: '1rem',
-                            padding: '0.5rem 1rem',
-                            background: '#ef4444',
-                            color: 'white',
-                            borderRadius: '6px',
-                            textDecoration: 'none',
-                            fontWeight: '600',
-                            fontSize: '0.875rem'
-                          }}
-                        >
-                          ▶️ Watch Video Explanation
-                        </a>
-                      )}
                     </div>
                   )}
                 </div>
               );
-            })}
-          </div>
-        </div>
-      ))}
+                  })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
-      <div style={{
+          <div style={{
         marginTop: '2rem',
         padding: '1.5rem',
         background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
@@ -302,7 +354,9 @@ const FAQSection = () => {
             📺 Pranjal Kamra - Financial planning
           </a>
         </div>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

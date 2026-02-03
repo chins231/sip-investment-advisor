@@ -24,13 +24,42 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-color);
+  /* Professional fintech gradient: Deep navy → Teal (trust & growth) */
+  background: linear-gradient(135deg, #001F3F 0%, #0A2540 30%, #004D40 70%, #00796B 100%);
+  background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
+  position: relative;
+}
+
+/* Subtle upward trending graph pattern (SIP growth theme) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.08;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    /* Upward trending lines (like stock charts going up) */
+    linear-gradient(120deg, transparent 0%, transparent 48%, rgba(16, 185, 129, 0.3) 48%, rgba(16, 185, 129, 0.3) 52%, transparent 52%, transparent 100%),
+    linear-gradient(60deg, transparent 0%, transparent 48%, rgba(16, 185, 129, 0.2) 48%, rgba(16, 185, 129, 0.2) 52%, transparent 52%, transparent 100%),
+    /* Subtle grid (like graph paper) */
+    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255, 255, 255, 0.03) 60px, rgba(255, 255, 255, 0.03) 61px),
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255, 255, 255, 0.03) 60px, rgba(255, 255, 255, 0.03) 61px),
+    /* Soft glow circles (representing growth/compounding) */
+    radial-gradient(circle at 15% 25%, rgba(0, 150, 136, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 85% 75%, rgba(0, 150, 136, 0.15) 0%, transparent 30%);
+  background-size: 800px 800px, 600px 600px, 60px 60px, 60px 60px, 100% 100%, 100% 100%;
 }
 
 .app {
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -78,7 +107,7 @@ body {
 }
 
 .header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #0A2540 0%, #004D40 50%, #00796B 100%);
   color: white;
   padding: 2rem 0;
   box-shadow: var(--shadow-lg);
@@ -100,7 +129,197 @@ body {
 }
 
 .card {
-  background: var(--card-bg);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* ===== TOP BANNER DISCLAIMER ===== */
+.top-banner {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-bottom: 2px solid var(--primary-color);
+  padding: 0.75rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.top-banner .container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.top-banner-icon {
+  font-size: 1.25rem;
+}
+
+.top-banner-text {
+  font-size: 0.95rem;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.top-banner-text strong {
+  font-weight: 700;
+}
+
+/* ===== RADIO BUTTON GROUPS ===== */
+.radio-group-horizontal {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.radio-option {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.radio-option input[type="radio"]:checked + .radio-content {
+  border-color: var(--primary-color);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.radio-option input[type="radio"]:hover + .radio-content {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.radio-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.radio-text {
+  flex: 1;
+}
+
+.radio-text strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.radio-text span {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Radio button indicator */
+.radio-content::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-content::before {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  box-shadow: inset 0 0 0 3px white;
+}
+
+/* Collapsible details styling */
+details {
+  margin-top: 0.5rem;
+}
+
+details summary {
+  cursor: pointer;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  user-select: none;
+}
+
+details summary:hover {
+  background: #eff6ff;
+}
+
+details[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+/* Fade-in animation for collapsible content */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse animation for loading */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .radio-group-horizontal {
+    flex-direction: column;
+  }
+  
+  .radio-option {
+    min-width: 100%;
+  }
+  
+  .top-banner-text {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: var(--shadow);

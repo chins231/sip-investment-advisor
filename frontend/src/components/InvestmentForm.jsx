@@ -174,21 +174,30 @@ const InvestmentForm = ({ onSubmit, loading }) => {
 
       <div className="form-group">
         <label>Risk Profile *</label>
-        <div className="risk-selector">
+        <div className="radio-group-horizontal">
           {riskProfiles.map((profile) => (
-            <div
+            <label
               key={profile.value}
-              className={`risk-option risk-${profile.value} ${
+              className={`radio-option ${
                 formData.risk_profile === profile.value ? 'selected' : ''
               }`}
-              onClick={() => !loading && handleRiskSelect(profile.value)}
             >
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-                {profile.icon}
-              </div>
-              <h3>{profile.title}</h3>
-              <p>{profile.description}</p>
-            </div>
+              <input
+                type="radio"
+                name="risk_profile"
+                value={profile.value}
+                checked={formData.risk_profile === profile.value}
+                onChange={(e) => !loading && handleRiskSelect(e.target.value)}
+                disabled={loading}
+              />
+              <span className="radio-content">
+                <span className="radio-icon">{profile.icon}</span>
+                <span className="radio-text">
+                  <strong>{profile.title}</strong>
+                  <small>{profile.description}</small>
+                </span>
+              </span>
+            </label>
           ))}
         </div>
         {errors.risk_profile && (
@@ -260,40 +269,57 @@ const InvestmentForm = ({ onSubmit, loading }) => {
         <label>
           Fund Selection Mode * <span style={{fontSize: '0.7rem', color: '#10b981'}}>NEW</span>
         </label>
-        <div className="fund-mode-selector">
-          <div
-            className={`fund-mode-option ${formData.fund_selection_mode === 'curated' ? 'selected' : ''}`}
-            onClick={() => !loading && setFormData(prev => ({ ...prev, fund_selection_mode: 'curated' }))}
-          >
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>⭐</div>
-            <h4>Top Picks</h4>
-            <p>Curated selection of high-quality funds (3-10 per sector)</p>
-            <small style={{ color: '#10b981', fontWeight: 'bold' }}>✓ Recommended</small>
-          </div>
-          <div
-            className={`fund-mode-option ${formData.fund_selection_mode === 'comprehensive' ? 'selected' : ''}`}
-            onClick={() => !loading && setFormData(prev => ({ ...prev, fund_selection_mode: 'comprehensive' }))}
-          >
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📊</div>
-            <h4>All Available</h4>
-            <p>Complete list of all funds in MFApi database (10-50+ per sector)</p>
-            <small style={{ color: '#64748b' }}>More options, longer load time</small>
-          </div>
+        <div className="radio-group-horizontal">
+          <label className={`radio-option ${formData.fund_selection_mode === 'curated' ? 'selected' : ''}`}>
+            <input
+              type="radio"
+              name="fund_selection_mode"
+              value="curated"
+              checked={formData.fund_selection_mode === 'curated'}
+              onChange={(e) => !loading && setFormData(prev => ({ ...prev, fund_selection_mode: e.target.value }))}
+              disabled={loading}
+            />
+            <span className="radio-content">
+              <span className="radio-icon">⭐</span>
+              <span className="radio-text">
+                <strong>Top Picks</strong>
+                <small>Curated high-quality funds (Recommended)</small>
+              </span>
+            </span>
+          </label>
+          <label className={`radio-option ${formData.fund_selection_mode === 'comprehensive' ? 'selected' : ''}`}>
+            <input
+              type="radio"
+              name="fund_selection_mode"
+              value="comprehensive"
+              checked={formData.fund_selection_mode === 'comprehensive'}
+              onChange={(e) => !loading && setFormData(prev => ({ ...prev, fund_selection_mode: e.target.value }))}
+              disabled={loading}
+            />
+            <span className="radio-content">
+              <span className="radio-icon">📊</span>
+              <span className="radio-text">
+                <strong>All Available</strong>
+                <small>Complete MFApi database (More options)</small>
+              </span>
+            </span>
+          </label>
         </div>
-        <div className="info-box" style={{
+        <details style={{
           marginTop: '10px',
           padding: '12px',
           backgroundColor: '#f0f9ff',
           borderLeft: '3px solid #3b82f6',
-          borderRadius: '4px'
+          borderRadius: '4px',
+          cursor: 'pointer'
         }}>
-          <strong>ℹ️ Transparency Note:</strong>
-          <ul style={{ marginTop: '8px', marginBottom: '0', paddingLeft: '20px' }}>
+          <summary style={{ fontWeight: 'bold', cursor: 'pointer' }}>ℹ️ What's the difference?</summary>
+          <ul style={{ marginTop: '8px', marginBottom: '0', paddingLeft: '20px', fontSize: '0.9rem' }}>
             <li><strong>Top Picks:</strong> Hand-selected funds based on popularity, AUM, and track record</li>
             <li><strong>All Available:</strong> Fetches complete fund list from MFApi (may include newer/smaller funds)</li>
             <li>Both modes use real-time NAV data and the same recommendation algorithm</li>
           </ul>
-        </div>
+        </details>
       </div>
 
       <div className="form-group">

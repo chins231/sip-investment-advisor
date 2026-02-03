@@ -219,14 +219,19 @@ function App() {
         </div>
       </main>
 
-      <footer style={{ 
-        textAlign: 'center', 
-        padding: '2rem', 
-        color: '#64748b',
-        borderTop: '1px solid #e2e8f0',
-        marginTop: '3rem'
+      <footer style={{
+        textAlign: 'center',
+        padding: '2rem',
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(10px)',
+        color: '#1e293b',
+        borderTop: '2px solid rgba(255, 255, 255, 0.8)',
+        marginTop: '3rem',
+        boxShadow: '0 -4px 6px -1px rgb(0 0 0 / 0.1)',
+        position: 'relative',
+        zIndex: 10
       }}>
-        <p>
+        <p style={{ margin: 0, fontWeight: '500' }}>
           © 2026 SIP Investment Advisor. For educational purposes only.
           <br />
           Always consult with a certified financial advisor before investing.
