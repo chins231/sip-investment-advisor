@@ -121,7 +121,7 @@ function App() {
           {loading && (
             <div className="loading">
               <div className="spinner"></div>
-              <p style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '1rem' }}>
+              <p style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '1rem', color: '#ffffff' }}>
                 {loadingMessage}
               </p>
               
