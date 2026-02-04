@@ -260,6 +260,59 @@ def get_sectors():
         return jsonify({'sectors': sectors}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+@api.route('/search-fund', methods=['POST'])
+def search_fund():
+    """
+    Search for mutual funds by name using MFAPI
+    Returns fund details with NAV, CAGR, and other information
+    """
+    try:
+        data = request.json
+        query = data.get('query', '').strip()
+        
+        if not query:
+            return jsonify({'error': 'Search query is required'}), 400
+        
+        if len(query) < 2:
+            return jsonify({'error': 'Search query must be at least 2 characters'}), 400
+        
+        # Search for funds using MFAPI
+        from mf_api_service import search_funds_by_name
+        
+        search_results = search_funds_by_name(query)
+        
+        if not search_results:
+            return jsonify({
+                'funds': [],
+                'message': f'No funds found matching "{query}"'
+            }), 200
+        
+        # Format results to match our fund card structure
+        formatted_funds = []
+        for fund in search_results[:10]:  # Limit to top 10 results
+            formatted_fund = {
+                'name': fund.get('name', 'Unknown Fund'),
+                'scheme_code': fund.get('scheme_code'),
+                'fund_type': fund.get('fund_type', 'Other Scheme'),
+                'expected_return': fund.get('expected_return', 'N/A'),
+                'risk_level': fund.get('risk_level', 'Medium'),
+                'monthly_sip': fund.get('monthly_sip', 1000),
+                'cagr_3y': fund.get('cagr_3y'),
+                'current_nav': fund.get('current_nav'),
+                'data_source': fund.get('data_source', 'mfapi')
+            }
+            formatted_funds.append(formatted_fund)
+        
+        return jsonify({
+            'funds': formatted_funds,
+            'count': len(formatted_funds),
+            'query': query
+        }), 200
+        
+    except Exception as e:
+        print(f"Search error: {str(e)}")
+        return jsonify({'error': f'Search failed: {str(e)}'}), 500
+
 
 @api.route('/fund-holdings/<fund_name>', methods=['GET'])
 def get_fund_holdings(fund_name):

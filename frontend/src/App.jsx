@@ -3,6 +3,7 @@ import InvestmentForm from './components/InvestmentForm';
 import RecommendationResults from './components/RecommendationResults';
 import InvestmentPlatforms from './components/InvestmentPlatforms';
 import FAQSection from './components/FAQSection';
+import FundSearch from './components/FundSearch';
 import { generateRecommendations } from './services/api';
 
 function App() {
@@ -213,6 +214,11 @@ function App() {
               </div>
             </>
           )}
+
+          {/* Fund Search Section - Always visible */}
+          <div style={{ marginTop: '3rem' }}>
+            <FundSearch />
+          </div>
 
           {/* FAQ Section - Always visible */}
           <FAQSection />

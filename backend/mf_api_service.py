@@ -896,6 +896,98 @@ class MFApiService:
         return None
 
 
+def search_funds_by_name(query: str) -> List[Dict]:
+    """
+    Search for mutual funds by name across all available scheme codes
+    Returns a list of matching funds with their details
+    """
+    query_lower = query.lower()
+    results = []
+    seen_names = set()  # To avoid duplicates
+    
+    # Get the global service instance
+    service = mf_api_service
+    
+    # Search through all fund categories
+    all_codes = []
+    all_codes.extend(service.GENERAL_FUND_CODES.get('debt', []))
+    all_codes.extend(service.GENERAL_FUND_CODES.get('hybrid', []))
+    all_codes.extend(service.GENERAL_FUND_CODES.get('equity', []))
+    all_codes.extend(service.INDEX_FUND_CODES)
+    
+    # Also search sector funds
+    for sector_codes in service.SECTOR_FUND_CODES.values():
+        all_codes.extend(sector_codes)
+    
+    logger.info(f"Searching {len(all_codes)} funds for query: {query}")
+    
+    # Search through all scheme codes
+    for scheme_code in all_codes:
+        try:
+            fund_data = service.fetch_fund_details(scheme_code)
+            if not fund_data:
+                continue
+            
+            scheme_name = fund_data.get('meta', {}).get('scheme_name', '')
+            
+            # Check if query matches the fund name
+            if query_lower in scheme_name.lower():
+                # Avoid duplicates
+                if scheme_name in seen_names:
+                    continue
+                seen_names.add(scheme_name)
+                
+                # Get NAV and calculate CAGR
+                nav_data = fund_data.get('data', [])
+                current_nav = None
+                cagr_3y = None
+                
+                if nav_data and len(nav_data) > 0:
+                    try:
+                        current_nav = float(nav_data[0]['nav'])
+                        
+                        # Calculate 3-year CAGR if enough data
+                        if len(nav_data) >= 756:  # ~3 years of data
+                            nav_3y_ago = float(nav_data[755]['nav'])
+                            cagr_3y = round(((current_nav / nav_3y_ago) ** (1/3) - 1) * 100, 2)
+                    except (ValueError, KeyError, IndexError) as e:
+                        logger.debug(f"Error calculating metrics for {scheme_name}: {e}")
+                
+                # Determine fund type
+                fund_type = "Other Scheme"
+                if "index" in scheme_name.lower():
+                    fund_type = "Index Funds"
+                elif "debt" in scheme_name.lower() or "bond" in scheme_name.lower():
+                    fund_type = "Debt Fund"
+                elif "hybrid" in scheme_name.lower() or "balanced" in scheme_name.lower():
+                    fund_type = "Hybrid Fund"
+                elif "equity" in scheme_name.lower() or "stock" in scheme_name.lower():
+                    fund_type = "Equity Fund"
+                
+                results.append({
+                    'name': scheme_name,
+                    'scheme_code': scheme_code,
+                    'fund_type': fund_type,
+                    'current_nav': current_nav,
+                    'cagr_3y': cagr_3y,
+                    'risk_level': 'Medium',  # Default
+                    'monthly_sip': 1000,  # Default
+                    'expected_return': f"{cagr_3y}%" if cagr_3y else "N/A",
+                    'data_source': 'mfapi'
+                })
+                
+                # Limit results to prevent too many matches
+                if len(results) >= 15:
+                    break
+                    
+        except Exception as e:
+            logger.debug(f"Error searching scheme {scheme_code}: {e}")
+            continue
+    
+    logger.info(f"Found {len(results)} matching funds for query: {query}")
+    return results
+
+
 # Global instance
 mf_api_service = MFApiService()
 
