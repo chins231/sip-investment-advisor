@@ -63,6 +63,14 @@ class MFApiService:
             '120591',  # ICICI Prudential Smallcap Fund - Direct Plan - Growth
             '125354',  # Axis Small Cap Fund - Direct Plan - Growth
             '119212',  # DSP Small Cap Fund - Direct Plan - Growth
+            # HSBC Equity Funds
+            '120069',  # HSBC Small Cap Equity Fund - Growth Direct
+            '120034',  # HSBC Infrastructure Equity Fund - Growth Direct
+            '105228',  # HSBC Dividend Yield Equity Fund - Growth
+            # Defence Funds (for general search)
+            '151750',  # HDFC Defence Fund - Growth Option - Direct Plan
+            '152712',  # Motilal Oswal Nifty India Defence Index Fund Direct Plan Growth
+            '152798',  # Aditya Birla Sun Life Nifty India Defence Index Fund-Direct Growth
             '119570',  # Quant Small Cap Fund - Direct Plan - Growth
         ],
     }
