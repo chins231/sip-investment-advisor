@@ -59,6 +59,10 @@ class MFApiService:
             '130503',  # HDFC Small Cap Fund - Direct Plan - Growth ⭐ ADDED
             '119556',  # Aditya Birla Sun Life Small Cap Fund - Direct Plan - Growth
             '119557',  # Aditya Birla Sun Life Small Cap Fund - Direct Plan - IDCW
+            '125497',  # SBI Small Cap Fund - Direct Plan - Growth
+            '120591',  # ICICI Prudential Smallcap Fund - Direct Plan - Growth
+            '125354',  # Axis Small Cap Fund - Direct Plan - Growth
+            '119212',  # DSP Small Cap Fund - Direct Plan - Growth
             '119570',  # Quant Small Cap Fund - Direct Plan - Growth
         ],
     }
