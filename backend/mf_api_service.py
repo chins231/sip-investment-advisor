@@ -56,6 +56,9 @@ class MFApiService:
             '119567',  # Nippon India Small Cap Fund - Direct Plan - Growth
             '119568',  # DSP Midcap Fund - Direct Plan - Growth
             '119569',  # Motilal Oswal Midcap Fund - Direct Plan - Growth
+            '130503',  # HDFC Small Cap Fund - Direct Plan - Growth ⭐ ADDED
+            '119556',  # Aditya Birla Sun Life Small Cap Fund - Direct Plan - Growth
+            '119557',  # Aditya Birla Sun Life Small Cap Fund - Direct Plan - IDCW
             '119570',  # Quant Small Cap Fund - Direct Plan - Growth
         ],
     }
