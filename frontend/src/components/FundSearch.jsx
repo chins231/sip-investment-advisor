@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
+import FundPerformance from './FundPerformance';
+import FundHoldings from './FundHoldings';
 
 const FundSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -205,6 +207,31 @@ const FundSearch = () => {
 const FundCard = ({ fund }) => {
   const [showPerformance, setShowPerformance] = useState(false);
   const [showHoldings, setShowHoldings] = useState(false);
+  const [holdingsData, setHoldingsData] = useState(null);
+  const [loadingHoldings, setLoadingHoldings] = useState(false);
+
+  // Fetch holdings data when user clicks "View Holdings"
+  const fetchHoldings = async () => {
+    if (holdingsData) return; // Already loaded
+    
+    setLoadingHoldings(true);
+    try {
+      const response = await api.get(`/fund-holdings/${encodeURIComponent(fund.name)}`);
+      setHoldingsData(response.data);
+    } catch (error) {
+      console.error('Error fetching holdings:', error);
+      setHoldingsData({ holdings: [], note: 'Failed to load holdings data' });
+    } finally {
+      setLoadingHoldings(false);
+    }
+  };
+
+  const handleShowHoldings = () => {
+    if (!showHoldings) {
+      fetchHoldings();
+    }
+    setShowHoldings(!showHoldings);
+  };
 
   return (
     <div style={{
@@ -288,52 +315,33 @@ const FundCard = ({ fund }) => {
           📊 {showPerformance ? 'Hide' : 'View'} Performance
         </button>
         <button
-          onClick={() => setShowHoldings(!showHoldings)}
+          onClick={handleShowHoldings}
+          disabled={loadingHoldings}
           style={{
             flex: '1',
             minWidth: '150px',
             padding: '0.75rem 1.5rem',
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            background: loadingHoldings ? '#94a3b8' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
             color: '#ffffff',
             border: 'none',
             borderRadius: '8px',
             fontWeight: '600',
-            cursor: 'pointer',
+            cursor: loadingHoldings ? 'not-allowed' : 'pointer',
             transition: 'transform 0.2s'
           }}
         >
-          📈 {showHoldings ? 'Hide' : 'View'} Holdings
+          📈 {loadingHoldings ? 'Loading...' : showHoldings ? 'Hide' : 'View'} Holdings
         </button>
       </div>
 
-      {/* Performance Chart (placeholder for now) */}
+      {/* Performance Chart - Using FundPerformance component */}
       {showPerformance && (
-        <div style={{
-          marginTop: '1rem',
-          padding: '1rem',
-          background: '#f8fafc',
-          borderRadius: '8px',
-          border: '1px solid #e2e8f0'
-        }}>
-          <p style={{ color: '#64748b', margin: 0 }}>
-            📊 Performance chart will be loaded here...
-          </p>
-        </div>
+        <FundPerformance fundName={fund.name} />
       )}
 
-      {/* Holdings (placeholder for now) */}
+      {/* Holdings - Using FundHoldings component */}
       {showHoldings && (
-        <div style={{
-          marginTop: '1rem',
-          padding: '1rem',
-          background: '#f8fafc',
-          borderRadius: '8px',
-          border: '1px solid #e2e8f0'
-        }}>
-          <p style={{ color: '#64748b', margin: 0 }}>
-            📈 Fund holdings will be loaded here...
-          </p>
-        </div>
+        <FundHoldings holdingsData={holdingsData} />
       )}
     </div>
   );
