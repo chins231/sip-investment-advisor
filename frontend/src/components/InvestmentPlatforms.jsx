@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const InvestmentPlatforms = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   const platforms = [
     {
       name: 'Zerodha Coin',
@@ -120,12 +122,45 @@ const InvestmentPlatforms = () => {
 
   return (
     <div className="card" style={{ marginTop: '2rem' }}>
-      <h2>🚀 Where to Invest - Top SIP Platforms</h2>
-      <p style={{ color: '#64748b', marginBottom: '2rem' }}>
-        Choose any of these trusted platforms to start your SIP journey. All offer direct mutual funds with zero commission!
-      </p>
+      <div
+        onClick={() => setIsExpanded(!isExpanded)}
+        style={{
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '0.5rem',
+          borderRadius: '8px',
+          transition: 'background 0.2s'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+      >
+        <div>
+          <h2 style={{ marginBottom: '0.5rem' }}>🚀 Where to Invest - Top SIP Platforms</h2>
+          <p style={{ color: '#64748b', margin: 0 }}>
+            Choose any of these trusted platforms to start your SIP journey
+          </p>
+        </div>
+        <span style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+          color: '#2563eb',
+          transition: 'transform 0.3s',
+          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+          display: 'inline-block'
+        }}>
+          ▼
+        </span>
+      </div>
 
-      <div style={{ display: 'grid', gap: '1.5rem' }}>
+      {isExpanded && (
+        <div style={{ marginTop: '1.5rem' }}>
+          <p style={{ color: '#64748b', marginBottom: '2rem' }}>
+            All platforms offer direct mutual funds with zero commission!
+          </p>
+
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
         {platforms.map((platform, index) => (
           <div key={index} style={{
             border: '2px solid #e2e8f0',
@@ -211,25 +246,27 @@ const InvestmentPlatforms = () => {
             </details>
           </div>
         ))}
-      </div>
+          </div>
 
-      <div style={{ 
-        marginTop: '2rem', 
-        padding: '1.5rem', 
-        background: '#fff3cd',
-        borderRadius: '8px',
-        border: '2px solid #f59e0b'
-      }}>
-        <h4 style={{ marginBottom: '0.5rem' }}>💡 Pro Tips for Beginners:</h4>
-        <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.8' }}>
-          <li>Always choose <strong>Direct Plans</strong> (lower expense ratio)</li>
-          <li>Start with a small amount (₹500-1000) to learn</li>
-          <li>Set SIP date after your salary date (5th-10th of month)</li>
-          <li>Enable auto-debit for hassle-free investing</li>
-          <li>Don't stop SIP during market falls (best time to accumulate)</li>
-          <li>Review portfolio once every 6 months</li>
-        </ul>
-      </div>
+          <div style={{
+            marginTop: '2rem',
+            padding: '1.5rem',
+            background: '#fff3cd',
+            borderRadius: '8px',
+            border: '2px solid #f59e0b'
+          }}>
+            <h4 style={{ marginBottom: '0.5rem' }}>💡 Pro Tips for Beginners:</h4>
+            <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.8' }}>
+              <li>Always choose <strong>Direct Plans</strong> (lower expense ratio)</li>
+              <li>Start with a small amount (₹500-1000) to learn</li>
+              <li>Set SIP date after your salary date (5th-10th of month)</li>
+              <li>Enable auto-debit for hassle-free investing</li>
+              <li>Don't stop SIP during market falls (best time to accumulate)</li>
+              <li>Review portfolio once every 6 months</li>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
