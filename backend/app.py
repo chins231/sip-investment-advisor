@@ -1,9 +1,7 @@
-# Version: 2.0.3 - Add Flask-Limiter support
+# Version: 2.0.4 - Remove Flask-Limiter (causing circular import issues)
 # CRITICAL FIX: Import db from models.py to avoid multiple instances
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 import os
 from datetime import datetime
 import json
@@ -15,15 +13,6 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sip_advisor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-
-# Initialize rate limiter
-limiter = Limiter(
-    app=app,
-    key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://",
-    headers_enabled=True
-)
 
 # Import db from models and initialize with app
 # Import db and models from models.py
