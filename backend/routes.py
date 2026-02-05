@@ -402,9 +402,10 @@ def search_fund():
 def get_fund_holdings(fund_name):
     """
     Get portfolio holdings for a specific fund
+    Uses intelligent inference for funds not in SECTOR_FUNDS
     """
     try:
-        # Search for fund in all sectors
+        # Strategy 1: Search for fund in predefined SECTOR_FUNDS
         for sector_key, sector_data in SECTOR_FUNDS.items():
             for fund in sector_data['funds']:
                 if fund['name'].lower() == fund_name.lower():
@@ -419,8 +420,37 @@ def get_fund_holdings(fund_name):
                         'risk_level': fund['risk_level']
                     }), 200
         
-        return jsonify({'error': 'Fund not found'}), 404
+        # Strategy 2: Use holdings service to infer holdings for searched funds
+        from holdings_service import FundHoldingsService
+        holdings_service = FundHoldingsService()
+        
+        # Create fund_data dict for holdings service
+        fund_data = {
+            'fund_name': fund_name,
+            'name': fund_name
+        }
+        
+        # Try to get holdings using intelligent inference
+        holdings_result = holdings_service.get_holdings(fund_data)
+        
+        if holdings_result:
+            return jsonify({
+                'fund_name': fund_name,
+                'holdings': holdings_result.get('holdings', []),
+                'data_source': holdings_result.get('data_source', 'inference'),
+                'note': holdings_result.get('note', 'Holdings inferred from fund characteristics'),
+                'last_updated': holdings_result.get('last_updated', 'N/A')
+            }), 200
+        
+        # Strategy 3: Return empty holdings with informative message
+        return jsonify({
+            'fund_name': fund_name,
+            'holdings': [],
+            'note': 'Holdings data not available for this fund. This may be a debt fund, liquid fund, or fund with limited public data.'
+        }), 200
+        
     except Exception as e:
+        print(f"Error fetching holdings for {fund_name}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @api.route('/sector-funds', methods=['POST'])

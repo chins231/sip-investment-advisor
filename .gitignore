@@ -41,4 +41,7 @@ Thumbs.db
 
 # Logs
 logs/
+
+# Session summaries (local reference only)
+TODAY_SESSION_*.md
 *.logTASK_DISCUSSION.md

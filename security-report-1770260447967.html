@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Scan Report - https://sip-investment-advisor.vercel.app</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .header { border-bottom: 3px solid #3498db; padding-bottom: 20px; margin-bottom: 30px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0; }
+        .info-item { background: #ecf0f1; padding: 15px; border-radius: 5px; }
+        .info-label { font-weight: bold; color: #7f8c8d; font-size: 0.9em; }
+        .info-value { color: #2c3e50; font-size: 1.1em; margin-top: 5px; }
+        .stats { display: flex; justify-content: space-around; flex-wrap: wrap; margin: 20px 0; }
+        .stat-box { text-align: center; padding: 20px; border-radius: 8px; min-width: 120px; margin: 10px; }
+        .stat-number { font-size: 2em; font-weight: bold; }
+        .stat-label { font-size: 0.9em; margin-top: 5px; }
+        .critical { background: #e74c3c; color: white; }
+        .high { background: #e67e22; color: white; }
+        .medium { background: #f39c12; color: white; }
+        .low { background: #3498db; color: white; }
+        .info { background: #95a5a6; color: white; }
+        .vulnerability { background: #fff; border: 1px solid #ddd; border-radius: 5px; padding: 20px; margin: 15px 0; }
+        .vuln-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .vuln-title { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
+        .severity-badge { padding: 5px 15px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+        .vuln-section { margin: 10px 0; }
+        .vuln-label { font-weight: bold; color: #7f8c8d; margin-bottom: 5px; }
+        .vuln-content { color: #34495e; line-height: 1.6; }
+        .code { background: #f8f9fa; padding: 10px; border-left: 3px solid #3498db; font-family: monospace; overflow-x: auto; }
+        .recommendation { background: #d5f4e6; padding: 15px; border-radius: 5px; border-left: 4px solid #27ae60; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔒 Security Scan Report</h1>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Target URL</div>
+                <div class="info-value">https://sip-investment-advisor.vercel.app</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Scan ID</div>
+                <div class="info-value">SCAN-1770260441949</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Start Time</div>
+                <div class="info-value">2026-02-05 08:30:41</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Duration</div>
+                <div class="info-value">6 sec</div>
+            </div>
+        </div>
+    </div>
+    <h2>📊 Summary</h2>
+    <div class="stats">
+        <div class="stat-box critical">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Critical</div>
+        </div>
+        <div class="stat-box high">
+            <div class="stat-number">2</div>
+            <div class="stat-label">High</div>
+        </div>
+        <div class="stat-box medium">
+            <div class="stat-number">4</div>
+            <div class="stat-label">Medium</div>
+        </div>
+        <div class="stat-box low">
+            <div class="stat-number">5</div>
+            <div class="stat-label">Low</div>
+        </div>
+        <div class="stat-box info">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Info</div>
+        </div>
+    </div>
+    <h2>🔍 Vulnerabilities Found</h2>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">SQL Injection Vulnerability Detected</div>
+            <div class="severity-badge critical">CRITICAL</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">SQL INJECTION</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The application appears to be vulnerable to SQL injection attacks. An attacker could potentially read, modify, or delete database contents.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Payload</div>
+            <div class="code">&#39; WAITFOR DELAY &#39;0:0:5&#39;--</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">SQL error detected in response: &lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+    &lt;link rel=&quot;icon&quot; type=&quot;image/svg+xml&quot; href=&quot;/vite.svg&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scal</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">1. Use parameterized queries (prepared statements)<br>2. Implement input validation and sanitization<br>3. Use ORM frameworks with built-in protection<br>4. Apply principle of least privilege for database accounts<br>5. Implement Web Application Firewall (WAF)</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-89<br>
+                <strong>OWASP:</strong> A03:2021 - Injection<br>
+                <a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank">https://owasp.org/www-community/attacks/SQL_Injection</a><br>
+                <a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">https://cwe.mitre.org/data/definitions/89.html</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Security Header: X-Frame-Options</div>
+            <div class="severity-badge medium">MEDIUM</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">INSECURE HEADERS</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The X-Frame-Options security header is not present, which may expose the application to attacks.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Header &#39;X-Frame-Options&#39; is missing from the response</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">Add header: X-Frame-Options: DENY or X-Frame-Options: SAMEORIGIN</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-693<br>
+                <strong>OWASP:</strong> A05:2021 - Security Misconfiguration<br>
+                <a href="https://owasp.org/www-project-secure-headers/" target="_blank">https://owasp.org/www-project-secure-headers/</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Security Header: X-Content-Type-Options</div>
+            <div class="severity-badge medium">MEDIUM</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">INSECURE HEADERS</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The X-Content-Type-Options security header is not present, which may expose the application to attacks.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Header &#39;X-Content-Type-Options&#39; is missing from the response</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">Add header: X-Content-Type-Options: nosniff</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-693<br>
+                <strong>OWASP:</strong> A05:2021 - Security Misconfiguration<br>
+                <a href="https://owasp.org/www-project-secure-headers/" target="_blank">https://owasp.org/www-project-secure-headers/</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Security Header: Content-Security-Policy</div>
+            <div class="severity-badge high">HIGH</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">INSECURE HEADERS</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The Content-Security-Policy security header is not present, which may expose the application to attacks.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Header &#39;Content-Security-Policy&#39; is missing from the response</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">Add header: Content-Security-Policy: default-src &#39;self&#39;; script-src &#39;self&#39;; object-src &#39;none&#39;</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-693<br>
+                <strong>OWASP:</strong> A05:2021 - Security Misconfiguration<br>
+                <a href="https://owasp.org/www-project-secure-headers/" target="_blank">https://owasp.org/www-project-secure-headers/</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Security Header: X-XSS-Protection</div>
+            <div class="severity-badge low">LOW</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">INSECURE HEADERS</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The X-XSS-Protection security header is not present, which may expose the application to attacks.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Header &#39;X-XSS-Protection&#39; is missing from the response</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">Add header: X-XSS-Protection: 1; mode=block</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-693<br>
+                <strong>OWASP:</strong> A05:2021 - Security Misconfiguration<br>
+                <a href="https://owasp.org/www-project-secure-headers/" target="_blank">https://owasp.org/www-project-secure-headers/</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Security Header: Referrer-Policy</div>
+            <div class="severity-badge low">LOW</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">INSECURE HEADERS</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The Referrer-Policy security header is not present, which may expose the application to attacks.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Header &#39;Referrer-Policy&#39; is missing from the response</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">Add header: Referrer-Policy: strict-origin-when-cross-origin</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-693<br>
+                <strong>OWASP:</strong> A05:2021 - Security Misconfiguration<br>
+                <a href="https://owasp.org/www-project-secure-headers/" target="_blank">https://owasp.org/www-project-secure-headers/</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Security Header: Permissions-Policy</div>
+            <div class="severity-badge low">LOW</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">INSECURE HEADERS</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The Permissions-Policy security header is not present, which may expose the application to attacks.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Header &#39;Permissions-Policy&#39; is missing from the response</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">Add header: Permissions-Policy: geolocation=(), microphone=(), camera=()</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-693<br>
+                <strong>OWASP:</strong> A05:2021 - Security Misconfiguration<br>
+                <a href="https://owasp.org/www-project-secure-headers/" target="_blank">https://owasp.org/www-project-secure-headers/</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Information Disclosure via Server Header</div>
+            <div class="severity-badge low">LOW</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">SENSITIVE DATA EXPOSURE</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The Server header reveals server/technology information that could aid attackers.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Server: Vercel</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">Remove or obfuscate the Server header to prevent information disclosure.</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-200<br>
+                <strong>OWASP:</strong> A01:2021 - Broken Access Control<br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Authentication</div>
+            <div class="severity-badge high">HIGH</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">AUTHENTICATION BYPASS</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The API endpoint is accessible without authentication</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Endpoint returned 200 without authentication</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">1. Implement proper authentication (OAuth 2.0, JWT, API Keys)<br>2. Require authentication for all sensitive endpoints<br>3. Use HTTPS for all API communications<br>4. Implement token expiration and refresh mechanisms</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-306<br>
+                <strong>OWASP:</strong> A07:2021 - Identification and Authentication Failures<br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Broken Access Control</div>
+            <div class="severity-badge critical">CRITICAL</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">AUTHORIZATION FLAW</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The API accepts invalid or expired tokens, indicating broken access control</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Endpoint accepted invalid authorization token</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">1. Implement proper token validation<br>2. Verify user permissions for each request<br>3. Implement role-based access control (RBAC)<br>4. Use principle of least privilege</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-285<br>
+                <strong>OWASP:</strong> A01:2021 - Broken Access Control<br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing Rate Limiting</div>
+            <div class="severity-badge medium">MEDIUM</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">RATE LIMITING MISSING</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The API does not implement rate limiting, making it vulnerable to abuse and DoS attacks</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">Sent 20 requests without rate limiting</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">1. Implement rate limiting per user/IP<br>2. Return 429 (Too Many Requests) when limit exceeded<br>3. Include rate limit headers (X-RateLimit-*)<br>4. Consider implementing throttling and backoff strategies</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-770<br>
+                <strong>OWASP:</strong> A04:2021 - Insecure Design<br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Overly Permissive CORS Policy</div>
+            <div class="severity-badge medium">MEDIUM</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">SECURITY MISCONFIGURATION</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The API allows requests from any origin (Access-Control-Allow-Origin: *)</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">CORS header: *</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">1. Restrict CORS to specific trusted domains<br>2. Avoid using wildcard (*) for Access-Control-Allow-Origin<br>3. Validate Origin header on server side<br>4. Use credentials only with specific origins</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-942<br>
+                <strong>OWASP:</strong> A05:2021 - Security Misconfiguration<br>
+            </div>
+        </div>
+    </div>
+    <div class="vulnerability">
+        <div class="vuln-header">
+            <div class="vuln-title">Missing API Versioning</div>
+            <div class="severity-badge low">LOW</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Type</div>
+            <div class="vuln-content">API SECURITY ISSUE</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Description</div>
+            <div class="vuln-content">The API does not appear to use versioning, which can lead to breaking changes</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">URL</div>
+            <div class="code">https://sip-investment-advisor.vercel.app</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Evidence</div>
+            <div class="code">No version identifier found in URL</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">Recommendation</div>
+            <div class="recommendation">1. Implement API versioning (e.g., /v1/, /v2/)<br>2. Maintain backward compatibility<br>3. Document version deprecation policy<br>4. Use semantic versioning</div>
+        </div>
+        <div class="vuln-section">
+            <div class="vuln-label">References</div>
+            <div class="vuln-content">
+                <strong>CWE:</strong> CWE-1059<br>
+                <strong>OWASP:</strong> A04:2021 - Insecure Design<br>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Generated by Web Security Scanner</p>
+        <p>Report generated at: 2026-02-05 08:30:47</p>
+    </div>
+</div>
+</body>
+</html>

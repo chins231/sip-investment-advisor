@@ -1,4 +1,4 @@
-# Version: 2.0.4 - Remove Flask-Limiter (causing circular import issues)
+# Version: 2.0.5 - Fix holdings data for search results using intelligent inference
 # CRITICAL FIX: Import db from models.py to avoid multiple instances
 from flask import Flask, request, jsonify
 from flask_cors import CORS
