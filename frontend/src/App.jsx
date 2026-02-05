@@ -205,8 +205,6 @@ function App() {
               </div>
               <RecommendationResults data={results} />
               
-              <InvestmentPlatforms />
-              
               <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                 <button onClick={handleReset} className="btn btn-secondary">
                   Create New Plan
@@ -219,6 +217,9 @@ function App() {
           <div style={{ marginTop: '3rem' }}>
             <FundSearch />
           </div>
+
+          {/* Investment Platforms Section - Always visible, appears after Fund Search */}
+          <InvestmentPlatforms />
 
           {/* FAQ Section - Always visible */}
           <FAQSection />
