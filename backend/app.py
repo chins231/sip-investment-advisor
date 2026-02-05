@@ -34,10 +34,6 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# Import and register blueprints
-from routes import api
-app.register_blueprint(api, url_prefix='/api')
-
 # Root route - API information
 @app.route('/', methods=['GET'])
 def root():
@@ -120,6 +116,10 @@ def get_recommendations(user_id):
         'user': user.to_dict(),
         'recommendations': [rec.to_dict() for rec in recommendations]
     })
+
+# Import and register blueprints (at end to avoid circular imports)
+from routes import api
+app.register_blueprint(api, url_prefix='/api')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
