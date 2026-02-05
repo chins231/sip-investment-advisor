@@ -4,12 +4,54 @@ from models import db, User, SIPRecommendation
 from fund_data import FundDataService
 from sector_funds import get_sectors_list, get_sector_funds, SECTOR_FUNDS
 from holdings_service import holdings_service
+import re
 
 api = Blueprint('api', __name__)
 engine = SIPRecommendationEngine()
 fund_service = FundDataService()
 
+# Import limiter from main
+from main import limiter
+
+# Input validation helpers
+def validate_email(email):
+    """Validate email format"""
+    if not email or not isinstance(email, str):
+        return False
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+def validate_name(name):
+    """Validate name (alphanumeric and spaces, 2-100 chars)"""
+    if not name or not isinstance(name, str):
+        return False
+    name = name.strip()
+    if len(name) < 2 or len(name) > 100:
+        return False
+    return re.match(r'^[a-zA-Z\s]+$', name) is not None
+
+def validate_positive_number(value, min_val=0, max_val=None):
+    """Validate positive number within range"""
+    try:
+        num = float(value)
+        if num <= min_val:
+            return False
+        if max_val and num > max_val:
+            return False
+        return True
+    except (ValueError, TypeError):
+        return False
+
+def sanitize_string(text, max_length=200):
+    """Sanitize string input"""
+    if not text or not isinstance(text, str):
+        return ""
+    # Remove any HTML tags and limit length
+    text = re.sub(r'<[^>]+>', '', text)
+    return text.strip()[:max_length]
+
 @api.route('/generate-recommendations', methods=['POST'])
+@limiter.limit("10 per minute")
 def generate_recommendations():
     """
     Generate SIP recommendations based on user input
@@ -17,23 +59,50 @@ def generate_recommendations():
     try:
         data = request.json
         
+        # Validate request body exists
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
         # Validate required fields
         required_fields = ['name', 'email', 'risk_profile', 'investment_years', 'monthly_investment']
         for field in required_fields:
             if field not in data:
                 return jsonify({'error': f'Missing required field: {field}'}), 400
         
+        # Validate and sanitize name
+        name = sanitize_string(data['name'], max_length=100)
+        if not validate_name(name):
+            return jsonify({'error': 'Invalid name. Must be 2-100 characters, letters and spaces only'}), 400
+        
+        # Validate email
+        email = data['email'].strip().lower()
+        if not validate_email(email):
+            return jsonify({'error': 'Invalid email format'}), 400
+        
         # Validate risk profile
         risk_profile = data['risk_profile'].lower()
         if risk_profile not in ['low', 'medium', 'high']:
             return jsonify({'error': 'Risk profile must be low, medium, or high'}), 400
         
+        # Validate investment years (1-50 years)
+        if not validate_positive_number(data['investment_years'], min_val=0, max_val=50):
+            return jsonify({'error': 'Investment years must be between 1 and 50'}), 400
+        
+        # Validate monthly investment (500-10,000,000)
+        if not validate_positive_number(data['monthly_investment'], min_val=499, max_val=10000000):
+            return jsonify({'error': 'Monthly investment must be between 500 and 10,000,000'}), 400
+        
         risk_profile_key = f"{risk_profile}_risk"
         
-        # Get max_funds if provided
+        # Get max_funds if provided (1-20 funds)
         max_funds = data.get('max_funds', None)
         if max_funds is not None:
-            max_funds = int(max_funds)
+            try:
+                max_funds = int(max_funds)
+                if max_funds < 1 or max_funds > 20:
+                    return jsonify({'error': 'max_funds must be between 1 and 20'}), 400
+            except (ValueError, TypeError):
+                return jsonify({'error': 'max_funds must be a valid integer'}), 400
         
         # Get fund_selection_mode (default to 'curated')
         fund_selection_mode = data.get('fund_selection_mode', 'curated')
@@ -69,19 +138,20 @@ def generate_recommendations():
             index_funds_only=index_funds_only
         )
         
-        # Check if user exists, create or update
-        user = User.query.filter_by(email=data['email']).first()
+        # Check if user exists, create or update (use validated values)
+        user = User.query.filter_by(email=email).first()
         
         if not user:
             user = User(
-                name=data['name'],
-                email=data['email'],
+                name=name,
+                email=email,
                 risk_profile=risk_profile,
                 investment_years=int(data['investment_years']),
                 monthly_investment=float(data['monthly_investment'])
             )
             db.session.add(user)
         else:
+            user.name = name  # Update name with sanitized version
             user.risk_profile = risk_profile
             user.investment_years = int(data['investment_years'])
             user.monthly_investment = float(data['monthly_investment'])
@@ -152,6 +222,7 @@ def generate_recommendations():
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 @api.route('/user/<int:user_id>/recommendations', methods=['GET'])
+@limiter.limit("30 per minute")
 def get_user_recommendations(user_id):
     """
     Get saved recommendations for a user
@@ -182,6 +253,7 @@ def get_user_recommendations(user_id):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/compare-scenarios', methods=['POST'])
+@limiter.limit("10 per minute")
 def compare_scenarios():
     """
     Compare different investment scenarios
@@ -214,6 +286,7 @@ def compare_scenarios():
 
 
 @api.route('/fund-performance/<fund_name>', methods=['GET'])
+@limiter.limit("30 per minute")
 def get_fund_performance(fund_name):
     """
     Get performance data for a specific fund
@@ -240,6 +313,7 @@ def get_fund_performance(fund_name):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/fund-reviews/<fund_name>', methods=['GET'])
+@limiter.limit("30 per minute")
 def get_fund_reviews(fund_name):
     """
     Get user reviews for a specific fund
@@ -251,6 +325,7 @@ def get_fund_reviews(fund_name):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/sectors', methods=['GET'])
+@limiter.limit("50 per minute")
 def get_sectors():
     """
     Get list of available investment sectors
@@ -261,6 +336,7 @@ def get_sectors():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 @api.route('/search-fund', methods=['POST'])
+@limiter.limit("20 per minute")
 def search_fund():
     """
     Search for mutual funds by name using MFAPI
@@ -268,13 +344,20 @@ def search_fund():
     """
     try:
         data = request.json
-        query = data.get('query', '').strip()
+        
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        query = sanitize_string(data.get('query', ''), max_length=100).strip()
         
         if not query:
             return jsonify({'error': 'Search query is required'}), 400
         
         if len(query) < 2:
             return jsonify({'error': 'Search query must be at least 2 characters'}), 400
+        
+        if len(query) > 100:
+            return jsonify({'error': 'Search query must be less than 100 characters'}), 400
         
         # Search for funds using MFAPI
         from mf_api_service import search_funds_by_name
@@ -315,6 +398,7 @@ def search_fund():
 
 
 @api.route('/fund-holdings/<fund_name>', methods=['GET'])
+@limiter.limit("30 per minute")
 def get_fund_holdings(fund_name):
     """
     Get portfolio holdings for a specific fund
@@ -340,6 +424,7 @@ def get_fund_holdings(fund_name):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/sector-funds', methods=['POST'])
+@limiter.limit("20 per minute")
 def get_sector_specific_funds():
     """
     Get funds based on selected sectors
