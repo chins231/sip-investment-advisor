@@ -421,8 +421,7 @@ def get_fund_holdings(fund_name):
                     }), 200
         
         # Strategy 2: Use holdings service to infer holdings for searched funds
-        from holdings_service import FundHoldingsService
-        holdings_service = FundHoldingsService()
+        # Use the already-imported holdings_service instance from line 6
         
         # Create fund_data dict for holdings service
         fund_data = {
