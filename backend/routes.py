@@ -10,8 +10,8 @@ api = Blueprint('api', __name__)
 engine = SIPRecommendationEngine()
 fund_service = FundDataService()
 
-# Import limiter from app
-from app import limiter
+# Import limiter from app (temporarily disabled for deployment fix)
+# from app import limiter
 
 # Input validation helpers
 def validate_email(email):
@@ -51,7 +51,7 @@ def sanitize_string(text, max_length=200):
     return text.strip()[:max_length]
 
 @api.route('/generate-recommendations', methods=['POST'])
-@limiter.limit("10 per minute")
+# @limiter.limit("10 per minute")
 def generate_recommendations():
     """
     Generate SIP recommendations based on user input
@@ -222,7 +222,7 @@ def generate_recommendations():
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 @api.route('/user/<int:user_id>/recommendations', methods=['GET'])
-@limiter.limit("30 per minute")
+# @limiter.limit("30 per minute")
 def get_user_recommendations(user_id):
     """
     Get saved recommendations for a user
@@ -253,7 +253,7 @@ def get_user_recommendations(user_id):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/compare-scenarios', methods=['POST'])
-@limiter.limit("10 per minute")
+# @limiter.limit("10 per minute")
 def compare_scenarios():
     """
     Compare different investment scenarios
@@ -286,7 +286,7 @@ def compare_scenarios():
 
 
 @api.route('/fund-performance/<fund_name>', methods=['GET'])
-@limiter.limit("30 per minute")
+# @limiter.limit("30 per minute")
 def get_fund_performance(fund_name):
     """
     Get performance data for a specific fund
@@ -313,7 +313,7 @@ def get_fund_performance(fund_name):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/fund-reviews/<fund_name>', methods=['GET'])
-@limiter.limit("30 per minute")
+# @limiter.limit("30 per minute")
 def get_fund_reviews(fund_name):
     """
     Get user reviews for a specific fund
@@ -325,7 +325,7 @@ def get_fund_reviews(fund_name):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/sectors', methods=['GET'])
-@limiter.limit("50 per minute")
+# @limiter.limit("50 per minute")
 def get_sectors():
     """
     Get list of available investment sectors
@@ -336,7 +336,7 @@ def get_sectors():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 @api.route('/search-fund', methods=['POST'])
-@limiter.limit("20 per minute")
+# @limiter.limit("20 per minute")
 def search_fund():
     """
     Search for mutual funds by name using MFAPI
@@ -398,7 +398,7 @@ def search_fund():
 
 
 @api.route('/fund-holdings/<fund_name>', methods=['GET'])
-@limiter.limit("30 per minute")
+# @limiter.limit("30 per minute")
 def get_fund_holdings(fund_name):
     """
     Get portfolio holdings for a specific fund
@@ -424,7 +424,7 @@ def get_fund_holdings(fund_name):
         return jsonify({'error': str(e)}), 500
 
 @api.route('/sector-funds', methods=['POST'])
-@limiter.limit("20 per minute")
+# @limiter.limit("20 per minute")
 def get_sector_specific_funds():
     """
     Get funds based on selected sectors
