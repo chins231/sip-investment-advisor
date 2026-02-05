@@ -10,8 +10,8 @@ api = Blueprint('api', __name__)
 engine = SIPRecommendationEngine()
 fund_service = FundDataService()
 
-# Import limiter from main
-from main import limiter
+# Import limiter from app
+from app import limiter
 
 # Input validation helpers
 def validate_email(email):
