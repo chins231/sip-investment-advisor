@@ -265,7 +265,7 @@ function App() {
                   gap: '0.5rem'
                 }}>
                   <span>🔒</span>
-                  <span><strong>Privacy:</strong> Your information is processed securely and never shared with third parties.</span>
+                  <span style={{ fontWeight: '600' }}>Privacy: Your information is processed securely and never shared with third parties.</span>
                 </div>
               </div>
               <RecommendationResults
