@@ -1,38 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
 const Header = ({ onNavClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    const scrollElement = scrollRef.current;
-    if (!scrollElement) return;
-
-    const contentWidth = scrollElement.scrollWidth / 2; // Half because we have 2 copies
-    let scrollPosition = -contentWidth; // Start from left (negative position)
-    const scrollSpeed = 1; // pixels per frame
-    let animationId;
-
-    const scroll = () => {
-      scrollPosition += scrollSpeed;
-      
-      // Reset position when we've scrolled back to start
-      if (scrollPosition >= 0) {
-        scrollPosition = -contentWidth;
-      }
-      
-      scrollElement.style.transform = `translateX(${scrollPosition}px)`;
-      animationId = requestAnimationFrame(scroll);
-    };
-
-    animationId = requestAnimationFrame(scroll);
-
-    return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
-    };
-  }, []);
 
   const scrollToSection = (sectionId) => {
     setMobileMenuOpen(false);
@@ -85,6 +54,11 @@ const Header = ({ onNavClick }) => {
             {mobileMenuOpen ? '✕' : '☰'}
           </button>
         </div>
+        
+        {/* Static Disclaimer Banner */}
+        <div className="disclaimer-banner">
+          ℹ️ Demo App | Educational Use Only | Always Consult a Certified Financial Advisor
+        </div>
       </div>
 
       {/* Mobile Navigation */}
@@ -104,18 +78,6 @@ const Header = ({ onNavClick }) => {
           </button>
         </nav>
       )}
-
-      {/* Scrolling Disclaimer Banner */}
-      <div className="disclaimer-banner">
-        <div className="disclaimer-scroll" ref={scrollRef}>
-          <span className="disclaimer-content">
-            ℹ️ Demo App | Educational Use Only | Always Consult a Certified Financial Advisor
-          </span>
-          <span className="disclaimer-content">
-            ℹ️ Demo App | Educational Use Only | Always Consult a Certified Financial Advisor
-          </span>
-        </div>
-      </div>
     </header>
   );
 };
