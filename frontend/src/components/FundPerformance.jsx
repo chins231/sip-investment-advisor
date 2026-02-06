@@ -194,7 +194,7 @@ const FundPerformance = ({ fundName }) => {
               </div>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={300} key={`chart-${selectedPeriod}-${performanceData?.historical_data?.length || 0}`}>
               <LineChart data={performanceData.historical_data}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
@@ -220,6 +220,7 @@ const FundPerformance = ({ fundName }) => {
                   strokeWidth={2}
                   dot={false}
                   name="Fund NAV"
+                  isAnimationActive={false}
                 />
               </LineChart>
             </ResponsiveContainer>
