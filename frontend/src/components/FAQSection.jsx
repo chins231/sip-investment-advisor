@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const FAQSection = () => {
+const FAQSection = ({ forceExpanded }) => {
   const [openIndex, setOpenIndex] = useState(null);
   const [isSectionExpanded, setIsSectionExpanded] = useState(false);
   const [openCategories, setOpenCategories] = useState({});
+  
+  // Auto-expand when forceExpanded prop is true
+  useEffect(() => {
+    if (forceExpanded) {
+      setIsSectionExpanded(true);
+    }
+  }, [forceExpanded]);
 
   const faqs = [
     {

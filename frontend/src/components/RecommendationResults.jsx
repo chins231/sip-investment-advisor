@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import FundPerformance from './FundPerformance';
 import FundHoldings from './FundHoldings';
+import { generatePDF } from '../utils/pdfGenerator';
 
-const RecommendationResults = ({ data }) => {
+const RecommendationResults = ({ data, userName, userPreferences }) => {
   const { recommendations, portfolio_summary, investment_strategy, data_source, fund_count_info } = data;
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedHoldings, setSelectedHoldings] = useState(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   
   // Debug logging
   console.log('[RecommendationResults] Full data:', data);
@@ -41,8 +43,62 @@ const RecommendationResults = ({ data }) => {
     return `${value.toFixed(2)}%`;
   };
 
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    await generatePDF(userName || 'User', data, userPreferences);
+    setIsGeneratingPDF(false);
+  };
+
   return (
     <div className="results-section">
+      {/* Download PDF Button - Prominent placement at top */}
+      <div className="pdf-download-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '2rem',
+        gap: '1rem',
+        flexWrap: 'wrap'
+      }}>
+        <button
+          onClick={handleDownloadPDF}
+          disabled={isGeneratingPDF}
+          style={{
+            padding: '1rem 2rem',
+            background: isGeneratingPDF ? '#94a3b8' : 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: isGeneratingPDF ? 'not-allowed' : 'pointer',
+            fontWeight: '700',
+            fontSize: '1.1rem',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            transform: isGeneratingPDF ? 'none' : 'translateY(0)',
+          }}
+          onMouseEnter={(e) => {
+            if (!isGeneratingPDF) {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isGeneratingPDF) {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            }
+          }}
+        >
+          <span style={{ fontSize: '1.5rem' }}>
+            {isGeneratingPDF ? '⏳' : '📄'}
+          </span>
+          <span>
+            {isGeneratingPDF ? 'Generating PDF...' : 'Download Investment Plan (PDF)'}
+          </span>
+        </button>
+      </div>
       {/* Data Source Banner */}
       {data_source && (
         <div className={`data-source-banner ${data_source.source === 'api' ? 'api-data' : 'static-data'}`}>

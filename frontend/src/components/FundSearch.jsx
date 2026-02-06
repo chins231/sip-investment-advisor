@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import FundPerformance from './FundPerformance';
 import FundHoldings from './FundHoldings';
 
-const FundSearch = () => {
+const FundSearch = ({ forceExpanded }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // Start collapsed by default
+  
+  // Auto-expand when forceExpanded prop is true
+  useEffect(() => {
+    if (forceExpanded) {
+      setIsExpanded(true);
+    }
+  }, [forceExpanded]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -55,25 +63,40 @@ const FundSearch = () => {
   return (
     <div className="fund-search-section">
       <div className="card">
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '1rem',
-          background: 'linear-gradient(135deg, #00796B 0%, #00897B 100%)',
-          color: 'white',
-          borderRadius: '8px',
-          marginBottom: '1.5rem'
-        }}>
+        <div
+          onClick={() => setIsExpanded(!isExpanded)}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '1rem',
+            background: 'linear-gradient(135deg, #00796B 0%, #00897B 100%)',
+            color: 'white',
+            borderRadius: '8px',
+            marginBottom: isExpanded ? '1.5rem' : '0',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease'
+          }}
+        >
           <div>
             <h2 style={{ margin: 0, color: 'white' }}>🔍 Search Any Mutual Fund</h2>
             <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', opacity: 0.9 }}>
               Search for any mutual fund by name and get complete details including NAV, returns, holdings, and performance charts.
             </p>
           </div>
+          <span style={{
+            fontSize: '1.5rem',
+            marginLeft: '1rem',
+            transition: 'transform 0.3s ease',
+            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'
+          }}>
+            ▼
+          </span>
         </div>
 
-        <form onSubmit={handleSearch} style={{ marginBottom: '1.5rem' }}>
+        {isExpanded && (
+          <>
+            <form onSubmit={handleSearch} style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <input
               type="text"
@@ -144,10 +167,10 @@ const FundSearch = () => {
               </button>
             )}
           </div>
-        </form>
+            </form>
 
-        {/* Search Tips */}
-        <div style={{
+            {/* Search Tips */}
+            <div style={{
           background: '#f0f9ff',
           border: '1px solid #bae6fd',
           borderRadius: '8px',
@@ -161,11 +184,13 @@ const FundSearch = () => {
             <li>Try fund types: "Nifty", "Bluechip", "Midcap", "Index"</li>
             <li>Try specific funds: "Axis Nifty 50", "HDFC Top 100"</li>
           </ul>
-        </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Error Message */}
-      {error && (
+      {isExpanded && error && (
         <div style={{
           background: '#fef2f2',
           border: '1px solid #fecaca',
@@ -179,7 +204,7 @@ const FundSearch = () => {
       )}
 
       {/* Search Results */}
-      {searchResults.length > 0 && (
+      {isExpanded && searchResults.length > 0 && (
         <div style={{ marginTop: '2rem' }}>
           <h3 style={{ marginBottom: '1rem', color: '#1e293b' }}>
             📊 Found {searchResults.length} fund{searchResults.length > 1 ? 's' : ''} matching "{searchQuery}"
@@ -194,7 +219,7 @@ const FundSearch = () => {
       )}
 
       {/* No Results Message */}
-      {hasSearched && !searching && searchResults.length === 0 && !error && (
+      {isExpanded && hasSearched && !searching && searchResults.length === 0 && !error && (
         <div style={{
           background: '#fffbeb',
           border: '1px solid #fde68a',

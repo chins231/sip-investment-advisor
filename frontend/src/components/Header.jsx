@@ -1,33 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const Header = () => {
+const Header = ({ onNavClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+    if (!scrollElement) return;
+
+    const contentWidth = scrollElement.scrollWidth / 2; // Half because we have 2 copies
+    let scrollPosition = -contentWidth; // Start from left (negative position)
+    const scrollSpeed = 1; // pixels per frame
+
+    const scroll = () => {
+      scrollPosition += scrollSpeed;
+      
+      // Reset position when we've scrolled back to start
+      if (scrollPosition >= 0) {
+        scrollPosition = -contentWidth;
+      }
+      
+      scrollElement.style.transform = `translateX(${scrollPosition}px)`;
+      requestAnimationFrame(scroll);
+    };
+
+    const animationId = requestAnimationFrame(scroll);
+
+    return () => cancelAnimationFrame(animationId);
+  }, []);
 
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setMobileMenuOpen(false);
+    setMobileMenuOpen(false);
+    if (onNavClick) {
+      onNavClick(sectionId);
+    } else {
+      // Fallback if onNavClick is not provided
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
   return (
     <header className="sticky-header">
-      {/* Blue Navigation Bar */}
+      {/* Teal Navigation Bar */}
       <div className="header-nav-bar">
         <div className="header-container">
-          {/* Logo/Brand with Title and Subtitle */}
+          {/* Logo/Brand - Single Title */}
           <div className="header-brand-section">
             <div className="header-brand">
               <span className="brand-icon">💰</span>
-              <div className="brand-content">
-                <h1 className="brand-title">SIP Advisor</h1>
-                <p className="brand-subtitle">SIP Investment Advisor</p>
-              </div>
+              <h1 className="brand-title">SIP Investment Advisor</h1>
             </div>
-            <p className="brand-description">
-              Get personalized mutual fund recommendations based on your risk profile and investment goals
-            </p>
           </div>
 
           {/* Desktop Navigation */}
@@ -75,12 +100,16 @@ const Header = () => {
         </nav>
       )}
 
-      {/* Disclaimer Banner */}
+      {/* Scrolling Disclaimer Banner */}
       <div className="disclaimer-banner">
-        <span className="disclaimer-icon">ℹ️</span>
-        <span className="disclaimer-text">
-          Demo App | Educational Use Only | Always Consult a Certified Financial Advisor
-        </span>
+        <div className="disclaimer-scroll" ref={scrollRef}>
+          <span className="disclaimer-content">
+            ℹ️ Demo App | Educational Use Only | Always Consult a Certified Financial Advisor
+          </span>
+          <span className="disclaimer-content">
+            ℹ️ Demo App | Educational Use Only | Always Consult a Certified Financial Advisor
+          </span>
+        </div>
       </div>
     </header>
   );

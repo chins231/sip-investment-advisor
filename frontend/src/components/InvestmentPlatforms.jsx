@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const InvestmentPlatforms = () => {
+const InvestmentPlatforms = ({ forceExpanded }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Auto-expand when forceExpanded prop is true
+  useEffect(() => {
+    if (forceExpanded) {
+      setIsExpanded(true);
+    }
+  }, [forceExpanded]);
   
   const platforms = [
     {
@@ -138,18 +145,16 @@ const InvestmentPlatforms = () => {
         }}
       >
         <div>
-          <h2 style={{ margin: 0, color: 'white' }}>🚀 Where to Invest - Top SIP Platforms</h2>
-          <p style={{ color: '#64748b', margin: 0 }}>
+          <h2 style={{ margin: 0, color: 'white' }}>🏦 Investment Platforms</h2>
+          <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', opacity: 0.9 }}>
             Choose any of these trusted platforms to start your SIP journey
           </p>
         </div>
         <span style={{
           fontSize: '1.5rem',
-          fontWeight: 'bold',
-          color: '#2563eb',
-          transition: 'transform 0.3s',
-          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-          display: 'inline-block'
+          marginLeft: '1rem',
+          transition: 'transform 0.3s ease',
+          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'
         }}>
           ▼
         </span>

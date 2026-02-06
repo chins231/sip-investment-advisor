@@ -13,8 +13,16 @@ function App() {
   const [results, setResults] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState('');
+  const [userPreferences, setUserPreferences] = useState(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [loadingStage, setLoadingStage] = useState(0);
+  
+  // Collapsible sections state with timestamp to force re-expansion
+  const [sectionsExpanded, setSectionsExpanded] = useState({
+    search: { expanded: false, timestamp: 0 },
+    platforms: { expanded: false, timestamp: 0 },
+    faq: { expanded: false, timestamp: 0 }
+  });
 
   // Progressive loading messages for cold start detection
   useEffect(() => {
@@ -78,6 +86,16 @@ function App() {
       setResults(data);
       setUserId(data.user_id);
       setUserName(formData.name);
+      
+      // Store user preferences for PDF generation
+      setUserPreferences({
+        monthly_investment: formData.monthly_investment,
+        duration: formData.investment_years,
+        risk_profile: formData.risk_profile,
+        fund_mode: formData.index_funds_only ? 'Index Funds Only' :
+                   formData.sector_preferences?.length > 0 ? 'Sector-Specific' :
+                   'Diversified Portfolio'
+      });
     } catch (err) {
       setError(err.toString());
       console.error('Error generating recommendations:', err);
@@ -91,12 +109,44 @@ function App() {
     setError(null);
     setUserId(null);
     setUserName('');
+    setUserPreferences(null);
+  };
+
+  const toggleSection = (section) => {
+    setSectionsExpanded(prev => ({
+      ...prev,
+      [section]: {
+        expanded: !prev[section].expanded,
+        timestamp: Date.now()
+      }
+    }));
+  };
+
+  const handleNavClick = (sectionId) => {
+    // Expand the section if it's collapsible (use timestamp to force re-expansion)
+    if (sectionId === 'search' || sectionId === 'platforms' || sectionId === 'faq') {
+      setSectionsExpanded(prev => ({
+        ...prev,
+        [sectionId]: {
+          expanded: true,
+          timestamp: Date.now()
+        }
+      }));
+    }
+    
+    // Scroll to section after a brief delay to allow expansion
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   return (
     <div className="app">
       {/* New Sticky Header with Navigation */}
-      <Header />
+      <Header onNavClick={handleNavClick} />
 
       <main className="main-content">
         <div className="container">
@@ -111,16 +161,24 @@ function App() {
             {!results && (
               <div className="card">
                 <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '1rem',
+                  padding: '1.5rem',
                   background: 'linear-gradient(135deg, #00796B 0%, #00897B 100%)',
                   color: 'white',
                   borderRadius: '8px',
                   marginBottom: '1.5rem'
                 }}>
-                  <h2 style={{ margin: 0, color: 'white' }}>🎯 Tell Us About Your Investment Goals</h2>
+                  <h2 style={{ margin: '0 0 0.5rem 0', color: 'white', fontSize: '1.75rem' }}>
+                    🎯 Tell Us About Your Investment Goals
+                  </h2>
+                  <p style={{
+                    margin: 0,
+                    color: 'rgba(255, 255, 255, 0.95)',
+                    fontSize: '1rem',
+                    fontWeight: '400',
+                    lineHeight: '1.5'
+                  }}>
+                    Get personalized mutual fund recommendations based on your risk profile and investment goals
+                  </p>
                 </div>
                 <InvestmentForm onSubmit={handleFormSubmit} loading={loading} />
               </div>
@@ -210,7 +268,11 @@ function App() {
                   <span><strong>Privacy:</strong> Your information is processed securely and never shared with third parties.</span>
                 </div>
               </div>
-              <RecommendationResults data={results} />
+              <RecommendationResults
+                data={results}
+                userName={userName}
+                userPreferences={userPreferences}
+              />
               
               <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                 <button onClick={handleReset} className="btn btn-secondary">
@@ -221,19 +283,19 @@ function App() {
           )}
           </section>
 
-          {/* Fund Search Section - Always visible */}
+          {/* Fund Search Section - Has internal collapse functionality */}
           <section id="search" className="section-search" style={{ marginTop: '3rem' }}>
-            <FundSearch />
+            <FundSearch forceExpanded={sectionsExpanded.search.expanded} key={sectionsExpanded.search.timestamp} />
           </section>
 
-          {/* Investment Platforms Section - Always visible, appears after Fund Search */}
+          {/* Investment Platforms Section - Has internal collapse functionality */}
           <section id="platforms" className="section-platforms">
-            <InvestmentPlatforms />
+            <InvestmentPlatforms forceExpanded={sectionsExpanded.platforms.expanded} key={sectionsExpanded.platforms.timestamp} />
           </section>
 
-          {/* FAQ Section - Always visible */}
+          {/* FAQ Section - Has internal collapse functionality */}
           <section id="faq" className="section-faq">
-            <FAQSection />
+            <FAQSection forceExpanded={sectionsExpanded.faq.expanded} key={sectionsExpanded.faq.timestamp} />
           </section>
         </div>
       </main>
