@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
 import InvestmentForm from './components/InvestmentForm';
 import RecommendationResults from './components/RecommendationResults';
 import InvestmentPlatforms from './components/InvestmentPlatforms';
@@ -94,15 +95,8 @@ function App() {
 
   return (
     <div className="app">
-      <header className="header">
-        <div className="container">
-          <h1>📈 SIP Investment Advisor</h1>
-          <p>
-            Get personalized mutual fund recommendations based on your risk profile
-            and investment goals
-          </p>
-        </div>
-      </header>
+      {/* New Sticky Header with Navigation */}
+      <Header />
 
       <main className="main-content">
         <div className="container">
@@ -112,14 +106,27 @@ function App() {
             </div>
           )}
 
-          {!results && (
-            <div className="card">
-              <h2>🎯 Tell Us About Your Investment Goals</h2>
-              <InvestmentForm onSubmit={handleFormSubmit} loading={loading} />
-            </div>
-          )}
+          {/* Goals Section */}
+          <section id="goals" className="section-goals">
+            {!results && (
+              <div className="card">
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '1rem',
+                  background: 'linear-gradient(135deg, #00796B 0%, #00897B 100%)',
+                  color: 'white',
+                  borderRadius: '8px',
+                  marginBottom: '1.5rem'
+                }}>
+                  <h2 style={{ margin: 0, color: 'white' }}>🎯 Tell Us About Your Investment Goals</h2>
+                </div>
+                <InvestmentForm onSubmit={handleFormSubmit} loading={loading} />
+              </div>
+            )}
 
-          {loading && (
+            {loading && (
             <div className="loading">
               <div className="spinner"></div>
               <p style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '1rem', color: '#ffffff' }}>
@@ -212,37 +219,69 @@ function App() {
               </div>
             </>
           )}
+          </section>
 
           {/* Fund Search Section - Always visible */}
-          <div style={{ marginTop: '3rem' }}>
+          <section id="search" className="section-search" style={{ marginTop: '3rem' }}>
             <FundSearch />
-          </div>
+          </section>
 
           {/* Investment Platforms Section - Always visible, appears after Fund Search */}
-          <InvestmentPlatforms />
+          <section id="platforms" className="section-platforms">
+            <InvestmentPlatforms />
+          </section>
 
           {/* FAQ Section - Always visible */}
-          <FAQSection />
+          <section id="faq" className="section-faq">
+            <FAQSection />
+          </section>
         </div>
       </main>
 
-      <footer style={{
-        textAlign: 'center',
-        padding: '2rem',
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(10px)',
-        color: '#1e293b',
-        borderTop: '2px solid rgba(255, 255, 255, 0.8)',
-        marginTop: '3rem',
-        boxShadow: '0 -4px 6px -1px rgb(0 0 0 / 0.1)',
-        position: 'relative',
-        zIndex: 10
-      }}>
-        <p style={{ margin: 0, fontWeight: '500' }}>
-          © 2026 SIP Investment Advisor. For educational purposes only.
-          <br />
-          Always consult with a certified financial advisor before investing.
-        </p>
+      <footer className="enhanced-footer">
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3>📈 SIP Investment Advisor</h3>
+            <p>Your trusted companion for smart SIP investments</p>
+          </div>
+          
+          <div className="footer-section">
+            <h4>Quick Links</h4>
+            <ul className="footer-links">
+              <li><a href="#goals">Investment Goals</a></li>
+              <li><a href="#search">Fund Search</a></li>
+              <li><a href="#platforms">Platforms</a></li>
+              <li><a href="#faq">FAQ</a></li>
+            </ul>
+          </div>
+          
+          <div className="footer-section">
+            <h4>Legal</h4>
+            <ul className="footer-links">
+              <li><a href="#privacy">Privacy Policy</a></li>
+              <li><a href="#terms">Terms of Service</a></li>
+              <li><a href="#disclaimer">Disclaimer</a></li>
+            </ul>
+          </div>
+          
+          <div className="footer-section">
+            <h4>Contact</h4>
+            <p>📧 support@sipadvisor.com</p>
+            <div className="social-links">
+              <a href="#twitter" aria-label="Twitter">🐦</a>
+              <a href="#linkedin" aria-label="LinkedIn">💼</a>
+              <a href="#github" aria-label="GitHub">💻</a>
+            </div>
+          </div>
+        </div>
+        
+        <div className="footer-bottom">
+          <p>© 2026 SIP Investment Advisor. For educational purposes only.</p>
+          <p className="footer-disclaimer">
+            ⚠️ Always consult with a certified financial advisor before investing.
+            Mutual fund investments are subject to market risks.
+          </p>
+        </div>
       </footer>
     </div>
   );

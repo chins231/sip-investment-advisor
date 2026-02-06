@@ -1,5 +1,5 @@
-# Import app and limiter from app.py to avoid circular imports
-from app import app, limiter
+# Import app from app.py to avoid circular imports
+from app import app
 
 # Add security headers to all responses
 @app.after_request
@@ -15,7 +15,6 @@ def add_security_headers(response):
 
 # Health check route
 @app.route('/')
-@limiter.limit("100 per minute")
 def index():
     return {
         'message': 'SIP Advisor API',
@@ -24,15 +23,14 @@ def index():
     }
 
 @app.route('/api/health')
-@limiter.limit("100 per minute")
 def health():
     return {'status': 'healthy', 'message': 'API is running'}
 
 if __name__ == '__main__':
     print("🚀 Starting SIP Advisor API...")
-    print("📡 API will be available at http://localhost:5001")
+    print("📡 API will be available at http://localhost:5000")
     print("📊 Frontend should connect to this API")
     print("\nPress CTRL+C to stop the server\n")
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
 # Made with Bob

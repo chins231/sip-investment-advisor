@@ -129,15 +129,16 @@ const InvestmentPlatforms = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '0.5rem',
+          padding: '1rem',
+          background: 'linear-gradient(135deg, #00796B 0%, #00897B 100%)',
+          color: 'white',
           borderRadius: '8px',
-          transition: 'background 0.2s'
+          marginBottom: isExpanded ? '1.5rem' : '0',
+          transition: 'all 0.3s ease'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
-        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
       >
         <div>
-          <h2 style={{ marginBottom: '0.5rem' }}>🚀 Where to Invest - Top SIP Platforms</h2>
+          <h2 style={{ margin: 0, color: 'white' }}>🚀 Where to Invest - Top SIP Platforms</h2>
           <p style={{ color: '#64748b', margin: 0 }}>
             Choose any of these trusted platforms to start your SIP journey
           </p>

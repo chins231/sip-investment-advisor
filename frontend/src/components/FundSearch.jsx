@@ -55,10 +55,23 @@ const FundSearch = () => {
   return (
     <div className="fund-search-section">
       <div className="card">
-        <h2 style={{ marginBottom: '1rem' }}>🔍 Search Any Mutual Fund</h2>
-        <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
-          Search for any mutual fund by name and get complete details including NAV, returns, holdings, and performance charts.
-        </p>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '1rem',
+          background: 'linear-gradient(135deg, #00796B 0%, #00897B 100%)',
+          color: 'white',
+          borderRadius: '8px',
+          marginBottom: '1.5rem'
+        }}>
+          <div>
+            <h2 style={{ margin: 0, color: 'white' }}>🔍 Search Any Mutual Fund</h2>
+            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', opacity: 0.9 }}>
+              Search for any mutual fund by name and get complete details including NAV, returns, holdings, and performance charts.
+            </p>
+          </div>
+        </div>
 
         <form onSubmit={handleSearch} style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
