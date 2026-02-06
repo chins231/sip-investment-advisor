@@ -272,13 +272,8 @@ function App() {
                 data={results}
                 userName={userName}
                 userPreferences={userPreferences}
+                onReset={handleReset}
               />
-              
-              <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                <button onClick={handleReset} className="btn btn-secondary">
-                  Create New Plan
-                </button>
-              </div>
             </>
           )}
           </section>

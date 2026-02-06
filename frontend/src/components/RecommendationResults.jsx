@@ -4,7 +4,7 @@ import FundPerformance from './FundPerformance';
 import FundHoldings from './FundHoldings';
 import { generatePDF } from '../utils/pdfGenerator';
 
-const RecommendationResults = ({ data, userName, userPreferences }) => {
+const RecommendationResults = ({ data, userName, userPreferences, onReset }) => {
   const { recommendations, portfolio_summary, investment_strategy, data_source, fund_count_info } = data;
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedHoldings, setSelectedHoldings] = useState(null);
@@ -51,7 +51,7 @@ const RecommendationResults = ({ data, userName, userPreferences }) => {
 
   return (
     <div className="results-section">
-      {/* Download PDF Button - Prominent placement at top */}
+      {/* Action Buttons - Download PDF and Create New Plan */}
       <div className="pdf-download-container" style={{
         display: 'flex',
         justifyContent: 'center',
@@ -97,6 +97,36 @@ const RecommendationResults = ({ data, userName, userPreferences }) => {
           <span>
             {isGeneratingPDF ? 'Generating PDF...' : 'Download Investment Plan (PDF)'}
           </span>
+        </button>
+
+        <button
+          onClick={onReset}
+          style={{
+            padding: '1rem 2rem',
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: '700',
+            fontSize: '1.1rem',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <span style={{ fontSize: '1.5rem' }}>🔄</span>
+          <span>Create New Plan</span>
         </button>
       </div>
       {/* Data Source Banner */}
