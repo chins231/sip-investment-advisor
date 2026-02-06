@@ -11,6 +11,7 @@ const Header = ({ onNavClick }) => {
     const contentWidth = scrollElement.scrollWidth / 2; // Half because we have 2 copies
     let scrollPosition = -contentWidth; // Start from left (negative position)
     const scrollSpeed = 1; // pixels per frame
+    let animationId;
 
     const scroll = () => {
       scrollPosition += scrollSpeed;
@@ -21,12 +22,16 @@ const Header = ({ onNavClick }) => {
       }
       
       scrollElement.style.transform = `translateX(${scrollPosition}px)`;
-      requestAnimationFrame(scroll);
+      animationId = requestAnimationFrame(scroll);
     };
 
-    const animationId = requestAnimationFrame(scroll);
+    animationId = requestAnimationFrame(scroll);
 
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
   }, []);
 
   const scrollToSection = (sectionId) => {
