@@ -72,15 +72,6 @@ const FundPerformance = ({ fundName }) => {
     return stars;
   };
 
-  if (loading) {
-    return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <div className="spinner"></div>
-        <p>Loading performance data...</p>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="error" style={{ margin: '1rem 0' }}>
@@ -89,7 +80,18 @@ const FundPerformance = ({ fundName }) => {
     );
   }
 
-  if (!performanceData) return null;
+  if (loading || !chartReady || !performanceData) {
+    return (
+      <div className="fund-performance" style={{ marginTop: '2rem' }}>
+        <div className="card">
+          <div style={{ padding: '3rem', textAlign: 'center' }}>
+            <div className="spinner"></div>
+            <p style={{ marginTop: '1rem', color: '#64748b' }}>Loading performance data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fund-performance" style={{ marginTop: '2rem' }}>
@@ -183,53 +185,49 @@ const FundPerformance = ({ fundName }) => {
           }}>
             <strong>NAV Trend Over Time</strong> (Vertical axis: NAV in ₹, Horizontal axis: Date)
           </div>
-          {loading || !chartReady ? (
+          {performanceData?.historical_data && performanceData.historical_data.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300} key={`chart-${selectedPeriod}-${performanceData.historical_data.length}`}>
+              <LineChart data={performanceData.historical_data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(date) => new Date(date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                  label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }}
+                />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  domain={['auto', 'auto']}
+                  label={{ value: 'NAV (₹)', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                />
+                <Tooltip
+                  formatter={(value) => formatCurrency(value)}
+                  labelFormatter={(date) => new Date(date).toLocaleDateString('en-IN')}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="nav"
+                  stroke="#2563eb"
+                  strokeWidth={2}
+                  dot={false}
+                  name="Fund NAV"
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
             <div style={{
               height: '300px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               background: '#f8fafc',
-              borderRadius: '8px'
+              borderRadius: '8px',
+              color: '#64748b'
             }}>
-              <div style={{ textAlign: 'center' }}>
-                <div className="spinner"></div>
-                <p style={{ marginTop: '1rem', color: '#64748b' }}>Loading chart data...</p>
-              </div>
+              No chart data available
             </div>
-          ) : (
-            performanceData?.historical_data && (
-              <ResponsiveContainer width="100%" height={300} key={`chart-${selectedPeriod}-${performanceData.historical_data.length}`}>
-                <LineChart data={performanceData.historical_data}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="date"
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={(date) => new Date(date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
-                    label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 12 }}
-                    domain={['auto', 'auto']}
-                    label={{ value: 'NAV (₹)', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
-                  />
-                  <Tooltip
-                    formatter={(value) => formatCurrency(value)}
-                    labelFormatter={(date) => new Date(date).toLocaleDateString('en-IN')}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="nav"
-                    stroke="#2563eb"
-                    strokeWidth={2}
-                    dot={false}
-                    name="Fund NAV"
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            )
           )}
         </div>
 
