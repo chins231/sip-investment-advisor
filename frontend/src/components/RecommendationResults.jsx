@@ -353,7 +353,7 @@ const RecommendationResults = ({ data, userName, userPreferences, onReset }) => 
               </div>
               
               {selectedFund === rec.fund_name && (
-                <FundPerformance fundName={rec.fund_name} />
+                <FundPerformance key={rec.fund_name} fundName={rec.fund_name} />
               )}
               
               {selectedHoldings === rec.fund_name && (
